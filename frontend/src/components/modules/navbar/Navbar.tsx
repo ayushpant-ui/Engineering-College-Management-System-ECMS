@@ -1,83 +1,51 @@
-// src/components/navbar/Navbar.tsx
-
 "use client";
 
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Search, LogIn } from "lucide-react";
 
-import Logo from "./Logo";
-import Sidebar from "./Sidebar";
-import ThemeToggle from "./ThemeToggle";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+
+import Logo from "@/components/sidebar/Logo";
+import ThemeToggle from "@/components/modules/navbar/ThemeToggle";
 
 export default function Navbar() {
-  const [scrolled, setScrolled] =
-    useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener(
-      "scroll",
-      handleScroll
-    );
-
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-  }, []);
-
   return (
-    <motion.header
-      initial={{
-        y: -70,
-        opacity: 0,
-      }}
-      animate={{
-        y: 0,
-        opacity: 1,
-      }}
-      transition={{
-        duration: 0.6,
-      }}
-      className={`
-        fixed
-        top-0
-        left-0
-        right-0
-        z-50
-        transition-all
-        duration-300
+    // <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+<header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/80 text-foreground backdrop-blur">
+      {/* Left */}
+      <div className="flex items-center gap-3">
 
-        ${
-          scrolled
-            ? "border-b bg-background/80 backdrop-blur-xl shadow-sm"
-            : "bg-transparent"
-        }
-      `}
-    >
-      <div
-        className="
-          mx-auto
-          flex
-          h-20
-          max-w-7xl
-          items-center
-          justify-between
-          px-6
-        "
-      >
+        <SidebarTrigger />
+
         <Logo />
 
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-
-          <Sidebar />
-        </div>
       </div>
-    </motion.header>
+
+      {/* Right */}
+      <div className="flex items-center gap-2">
+
+        {/* Search */}
+        <Button
+          variant="ghost"
+          size="icon"
+        >
+          <Search className="h-5 w-5" />
+        </Button>
+
+        {/* Theme */}
+        <ThemeToggle />
+
+        {/* Login */}
+<Link href="/login">
+  <Button>
+    <LogIn className="mr-2 h-4 w-4" />
+    Login
+  </Button>
+</Link>
+
+      </div>
+
+    </header>
   );
 }
