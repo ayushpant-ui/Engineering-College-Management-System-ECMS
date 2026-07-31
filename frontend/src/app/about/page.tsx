@@ -4,6 +4,8 @@ import VisionMission from "../../components/modules/about/VisionMission";
 import WhyChooseUs from "../../components/modules/about/WhyChooseUs";
 import PrincipleMessage from "../../components/modules/about/PrincipleMessage";
 import Statistics from "../../components/modules/about/Statistics";
+import Departments from "../../components/modules/about/Departments";
+
 
 
 export default function AboutSection() {
@@ -15,6 +17,7 @@ export default function AboutSection() {
       <WhyChooseUs />
       <PrincipleMessage />
       <Statistics />
+      <Departments />
     </>
   );
 }
