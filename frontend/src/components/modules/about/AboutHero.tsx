@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 
 export default function AboutHero() {
   return (
-    <section className="border-b bg-muted/30">
-      <div className="mx-auto max-w-7xl px-6 py-24 text-center">
+    <section className="border-b bg-muted/30 py-16">
+      <div className="mx-auto max-w-7xl px-6 py-16 text-center">
 
         <motion.h1
           initial={{ opacity: 0, y: 25 }}
