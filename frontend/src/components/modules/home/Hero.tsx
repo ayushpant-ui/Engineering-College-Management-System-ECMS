@@ -103,13 +103,12 @@ export default function Hero() {
 
                 <h3 className="mt-6 text-2xl font-semibold">
 
-                  College Logo
+                  FWU-Engineering
 
                 </h3>
 
                 <p className="mt-2 text-muted-foreground">
 
-                  Replace with your official logo
 
                 </p>
 

@@ -1,7 +1,11 @@
-export default function Home() {
+import Hero from "../components/modules/home/Hero";
+import Stats from "../components/modules/home/Stats";
+
+export default function HomeSection() {
   return (
-    <div className="bg-red-500 text-white p-10">
-      Tailwind is working!
-    </div>
+    <>
+      <Hero />
+      <Stats />
+    </>
   );
 }
