@@ -23,7 +23,7 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="mx-auto max-w-7xl px-6 pb-20 border-b border-border">
+    <section className="mx-auto max-w-7xl px-6 pb-20 border-b border-border mt-6">
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 

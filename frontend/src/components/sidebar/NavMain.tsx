@@ -27,13 +27,26 @@ export default function NavMain() {
 
             <SidebarMenuItem key={item.title}>
 
-<SidebarMenuButton
+              <SidebarMenuButton
+  isActive={pathname === item.url}
+>
+  <Link
+    href={item.url}
+    className="flex w-full cursor-pointer items-center gap-2"
+  >
+    <item.icon />
+    <span>{item.title}</span>
+  </Link>
+</SidebarMenuButton>
+
+{/* <SidebarMenuButton
+  className="cursor-pointer"
   render={<Link href={item.url} />}
   isActive={pathname === item.url}
 >
   <item.icon />
   <span>{item.title}</span>
-</SidebarMenuButton>
+</SidebarMenuButton> */}
 
             </SidebarMenuItem>
 
