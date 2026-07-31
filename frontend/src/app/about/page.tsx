@@ -5,6 +5,8 @@ import WhyChooseUs from "../../components/modules/about/WhyChooseUs";
 import PrincipleMessage from "../../components/modules/about/PrincipleMessage";
 import Statistics from "../../components/modules/about/Statistics";
 import Departments from "../../components/modules/about/Departments";
+import Facilities from "../../components/modules/about/Facilities";
+
 
 
 
@@ -18,6 +20,7 @@ export default function AboutSection() {
       <PrincipleMessage />
       <Statistics />
       <Departments />
+      <Facilities />
     </>
   );
 }
