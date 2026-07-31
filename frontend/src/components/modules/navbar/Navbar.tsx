@@ -29,6 +29,7 @@ export default function Navbar() {
         <Button
           variant="ghost"
           size="icon"
+          className='cursor-pointer'
         >
           <Search className="h-5 w-5" />
         </Button>
@@ -37,9 +38,10 @@ export default function Navbar() {
         <ThemeToggle />
 
         {/* Login */}
-<Link href="/login">
-  <Button>
-    <LogIn className="mr-2 h-4 w-4" />
+<Link href="/login" 
+className="cursor-pointer">
+  <Button className='cursor-pointer'>
+    <LogIn className="mr-2 h-4 w-4 " />
     Login
   </Button>
 </Link>

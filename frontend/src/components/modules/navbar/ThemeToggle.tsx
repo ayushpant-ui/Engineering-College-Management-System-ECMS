@@ -28,7 +28,7 @@ export default function ThemeToggle() {
       onClick={() =>
         setTheme(theme === "dark" ? "light" : "dark")
       }
-      className="relative overflow-hidden rounded-full"
+      className="relative overflow-hidden rounded-full cursor-pointer"
     >
       <motion.div
         key={theme}
