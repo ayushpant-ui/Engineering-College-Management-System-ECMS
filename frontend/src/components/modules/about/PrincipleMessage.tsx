@@ -6,7 +6,7 @@ import { Quote } from "lucide-react";
 
 export default function PrincipalMessage() {
   return (
-    <section className="py-16">
+    <section className="py-16 border-b border-border">
       <div className="mx-auto max-w-7xl px-6">
 
         <div className="grid items-center gap-12 lg:grid-cols-2">

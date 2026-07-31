@@ -12,7 +12,7 @@ import ThemeToggle from "@/components/modules/navbar/ThemeToggle";
 export default function Navbar() {
   return (
     // <header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/90 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-<header className="sticky top-0 z-50 flex h-16 items-center justify-between border-b bg-background/80 text-foreground backdrop-blur">
+<header className="sticky top-0  z-50 flex h-16 items-center justify-between border-b bg-background/80 text-foreground backdrop-blur">
       {/* Left */}
       <div className="flex items-center gap-3">
 

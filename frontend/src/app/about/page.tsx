@@ -3,6 +3,8 @@ import AboutCollege from "../../components/modules/about/AboutCollege";
 import VisionMission from "../../components/modules/about/VisionMission";
 import WhyChooseUs from "../../components/modules/about/WhyChooseUs";
 import PrincipleMessage from "../../components/modules/about/PrincipleMessage";
+import Statistics from "../../components/modules/about/Statistics";
+
 
 export default function AboutSection() {
   return (
@@ -12,6 +14,7 @@ export default function AboutSection() {
       <VisionMission />
       <WhyChooseUs />
       <PrincipleMessage />
+      <Statistics />
     </>
   );
 }

@@ -5,7 +5,7 @@ import { Eye, Target } from "lucide-react";
 
 export default function VisionMission() {
   return (
-    <section className="bg-muted/40 py-24">
+    <section className="bg-muted/40 py-16 border-b border-border">
 
       <div className="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-2">
 
