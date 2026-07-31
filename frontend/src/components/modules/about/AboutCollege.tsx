@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export default function AboutCollege() {
   return (
-    <section className="py-10">
+    <section className="py-16">
 
       <div className="mx-auto grid max-w-7xl items-center gap-16 px-6 lg:grid-cols-2">
 
