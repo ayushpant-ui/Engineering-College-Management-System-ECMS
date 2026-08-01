@@ -1,162 +1,224 @@
 "use client";
 
 import Link from "next/link";
-
 import {
+  FaFacebookF,
+  FaGithub,
+  FaLinkedinIn,
+  FaYoutube,
+} from "react-icons/fa";
+import {
+  Mail,
   MapPin,
   Phone,
-  Mail,
   Clock,
+  ArrowUpRight,
 } from "lucide-react";
-
-import {
-  quickLinks,
-  departments,
-  services,
-  socials,
-} from "./footerdata";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="mt-24 border-t border-border bg-background">
 
+      {/* Top */}
       <div className="mx-auto max-w-7xl px-6 py-16">
 
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-12 lg:grid-cols-12">
 
-          {/* Logo */}
+          {/* ================= LEFT ================= */}
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-5">
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
 
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl border font-bold">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-border text-xl font-bold shadow-sm">
                 SOE
               </div>
 
               <div>
 
-                <h2 className="text-xl font-bold">
+                <h2 className="text-2xl font-bold text-foreground">
                   School of Engineering
                 </h2>
 
-                <p className="text-sm text-muted-foreground">
-                  FarWestern University
+                <p className="text-muted-foreground">
+                  Far Western University
                 </p>
 
               </div>
 
             </div>
 
-            <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
-              School of Engineering is committed to excellence in engineering
-              education, research, innovation and preparing future engineers
-              capable of solving real-world problems.
+            <p className="mt-6 max-w-lg leading-8 text-muted-foreground">
+              Empowering future engineers through innovation,
+              research, quality education and practical learning.
+              We prepare students with the knowledge and skills
+              needed to solve real-world engineering challenges.
             </p>
+
+            {/* Social */}
+
+            <div className="mt-8 flex gap-3">
+
+              {[
+                FaFacebookF,
+                FaLinkedinIn,
+                FaYoutube,
+                FaGithub,
+              ].map((Icon, index) => (
+
+                <Link
+                  key={index}
+                  href="#"
+                  className="rounded-xl border border-border p-3 transition-all duration-300 hover:-translate-y-1 hover:bg-primary hover:text-primary-foreground"
+                >
+                  <Icon className="h-5 w-5" />
+                </Link>
+
+              ))}
+
+            </div>
 
           </div>
 
-          {/* Quick Links */}
+          {/* ================= LINKS ================= */}
 
-          <div>
+          <div className="lg:col-span-2">
 
-            <h3 className="mb-4 font-semibold">
+            <h3 className="mb-6 text-lg font-semibold text-foreground">
               Quick Links
             </h3>
 
-            <ul className="space-y-3">
+            <div className="space-y-4">
 
-              {quickLinks.map((item) => (
+              {[
+                "Home",
+                "About",
+                "Departments",
+                "Facilities",
+                "Notices",
+                "Contact",
+              ].map((item) => (
 
-                <li key={item.title}>
+                <Link
+                  key={item}
+                  href="#"
+                  className="group flex items-center justify-between text-muted-foreground transition hover:text-primary"
+                >
+                  {item}
 
-                  <Link
-                    href={item.href}
-                    className="text-sm text-muted-foreground transition hover:text-primary"
-                  >
-                    {item.title}
-                  </Link>
+                  <ArrowUpRight className="h-4 w-4 opacity-0 transition group-hover:opacity-100" />
 
-                </li>
+                </Link>
 
               ))}
 
-            </ul>
+            </div>
 
           </div>
 
-          {/* Departments */}
+          {/* ================= DEPARTMENTS ================= */}
 
-          <div>
+          <div className="lg:col-span-2">
 
-            <h3 className="mb-4 font-semibold">
+            <h3 className="mb-6 text-lg font-semibold text-foreground">
               Departments
             </h3>
 
-            <ul className="space-y-3">
+            <div className="space-y-4 text-muted-foreground">
 
-              {departments.map((dept) => (
+              <p>Computer Engineering</p>
 
-                <li
-                  key={dept}
-                  className="text-sm text-muted-foreground"
-                >
-                  {dept}
-                </li>
+              <p>Civil Engineering</p>
 
-              ))}
+              <p>Architecture</p>
 
-            </ul>
+            </div>
 
           </div>
 
-          {/* Contact */}
+          {/* ================= CONTACT ================= */}
 
-          <div>
+          <div className="lg:col-span-3">
 
-            <h3 className="mb-4 font-semibold">
+            <h3 className="mb-6 text-lg font-semibold text-foreground">
               Contact
             </h3>
 
-            <div className="space-y-4 text-sm text-muted-foreground">
+            <div className="space-y-6">
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
 
-                <MapPin className="mt-1 h-4 w-4 shrink-0" />
+                <MapPin className="mt-1 h-5 w-5 text-primary" />
 
-                <span>
-                  Kanchanpur, Nepal
-                </span>
+                <div>
 
-              </div>
+                  <p className="font-medium text-foreground">
+                    Address
+                  </p>
 
-              <div className="flex gap-3">
+                  <p className="text-muted-foreground">
+                    Kanchanpur, Nepal
+                  </p>
 
-                <Phone className="mt-1 h-4 w-4 shrink-0" />
-
-                <span>
-                  +977-9766987980
-                </span>
+                </div>
 
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
 
-                <Mail className="mt-1 h-4 w-4 shrink-0" />
+                <Phone className="mt-1 h-5 w-5 text-primary" />
 
-                <span>
-                  ayushpant2073@gmail.com
-                </span>
+                <div>
+
+                  <p className="font-medium text-foreground">
+                    Phone
+                  </p>
+
+                  <p className="text-muted-foreground">
+                    +977-98XXXXXXXX
+                  </p>
+
+                </div>
 
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
 
-                <Clock className="mt-1 h-4 w-4 shrink-0" />
+                <Mail className="mt-1 shrink-0 h-5 w-5 text-primary" />
 
-                <span>
-                  Mon - Fri : 10:00 AM - 5:00 PM
-                </span>
+                <div>
+
+                  <p className="font-medium text-foreground">
+                    Email
+                  </p>
+
+                  <p className="text-muted-foreground">
+                    engineering@example.com
+                  </p>
+
+                </div>
+
+              </div>
+
+              <div className="flex gap-4">
+
+                <Clock className="mt-1 h-5 w-5 text-primary" />
+
+                <div>
+
+                  <p className="font-medium text-foreground">
+                    Office Hours
+                  </p>
+
+                  <p className="text-muted-foreground">
+                    Sun - Fri
+                  </p>
+
+                  <p className="text-muted-foreground">
+                    10:00 AM - 5:00 PM
+                  </p>
+
+                </div>
 
               </div>
 
@@ -166,31 +228,40 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom */}
+      </div>
 
-        <div className="mt-12 border-t border-border pt-6">
+      {/* Bottom */}
 
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+      <div className="border-t border-border bg-muted/40">
 
-            <p className="text-sm text-muted-foreground">
-              © 2026 School of Engineering. All Rights Reserved.
-            </p>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
 
-            <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            © 2026 School of Engineering. All rights reserved.
+          </p>
 
-              {socials.map(({ icon: Icon, href }, index) => (
+          <div className="flex gap-6 text-sm">
 
-                <Link
-                  key={index}
-                  href={href}
-                  className="rounded-full border p-2 transition hover:bg-primary hover:text-primary-foreground"
-                >
-                  <Icon className="h-4 w-4" />
-                </Link>
+            <Link
+              href="#"
+              className="text-muted-foreground transition hover:text-primary"
+            >
+              Privacy Policy
+            </Link>
 
-              ))}
+            <Link
+              href="#"
+              className="text-muted-foreground transition hover:text-primary"
+            >
+              Terms of Service
+            </Link>
 
-            </div>
+            <Link
+              href="#"
+              className="text-muted-foreground transition hover:text-primary"
+            >
+              Accessibility
+            </Link>
 
           </div>
 
