@@ -1,11 +1,9 @@
 // src/components/modules/footer/footer-data.ts
 
-import {
-  Facebook,
-  Github,
-  Linkedin,
-  Youtube,
-} from "lucide-react";
+
+import { FaFacebook } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa"
+import { FaLinkedin } from "react-icons/fa";
 
 export const quickLinks = [
   { title: "Home", href: "/" },
@@ -33,19 +31,15 @@ export const services = [
 
 export const socials = [
   {
-    icon: Facebook,
+    icon: FaFacebook,
     href: "#",
   },
   {
-    icon: Linkedin,
+    icon: FaLinkedin,
     href: "#",
   },
   {
-    icon: Youtube,
-    href: "#",
-  },
-  {
-    icon: Github,
+    icon: FaGithub,
     href: "#",
   },
 ];

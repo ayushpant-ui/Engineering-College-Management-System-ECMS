@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import ThemeProvider from "@/providers/themeproviders";
+import Footer from "@/components/modules/footer/Footer";
 
 import {
   SidebarProvider,
@@ -54,7 +55,7 @@ export default function RootLayout({
               <main className="flex-1 p-6">
                 {children}
               </main>
-
+              <Footer />
             </SidebarInset>
 
           </SidebarProvider>
