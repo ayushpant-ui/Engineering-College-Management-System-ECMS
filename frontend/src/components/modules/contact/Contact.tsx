@@ -49,9 +49,9 @@ export default function Contact() {
             <div className="space-y-8">
 
               <div className="flex gap-4">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <MapPin className="h-6 w-6 text-primary" />
-                </div>
+       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+    <MapPin className="h-6 w-6 text-primary" />
+  </div>
 
                 <div>
                   <h4 className="font-semibold">Address</h4>
@@ -66,22 +66,22 @@ export default function Contact() {
               </div>
 
               <div className="flex gap-4">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <Phone className="h-6 w-6 text-primary" />
-                </div>
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+  <Phone className="h-6 w-6" />
+</div>
 
                 <div>
                   <h4 className="font-semibold">Phone</h4>
                   <p className="text-muted-foreground">
-                    +977-98XXXXXXXX
+                    +977-9766987980
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <Mail className="h-6 w-6 text-primary" />
-                </div>
+<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+  <Mail className="h-6 w-6" />
+</div>
 
                 <div>
                   <h4 className="font-semibold">Email</h4>
@@ -92,16 +92,16 @@ export default function Contact() {
               </div>
 
               <div className="flex gap-4">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <Clock className="h-6 w-6 text-primary" />
-                </div>
+<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-muted">
+  <Clock className="h-6 w-6" />
+</div>
 
                 <div>
                   <h4 className="font-semibold">Office Hours</h4>
                   <p className="text-muted-foreground">
-                    Sunday – Friday
+                    Monday – Friday
                     <br />
-                    10:00 AM – 5:00 PM
+                    9:00 AM – 5:00 PM
                   </p>
                 </div>
               </div>
