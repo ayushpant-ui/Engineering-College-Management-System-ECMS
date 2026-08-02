@@ -48,12 +48,12 @@ export default function Footer() {
 
             </div>
 
-            <p className="mt-6 max-w-lg leading-8 text-muted-foreground">
+            {/* <p className="mt-6 max-w-lg leading-8 text-muted-foreground">
               Empowering future engineers through innovation,
               research, quality education and practical learning.
               We prepare students with the knowledge and skills
               needed to solve real-world engineering challenges.
-            </p>
+            </p> */}
 
             {/* Social */}
 
@@ -175,7 +175,7 @@ export default function Footer() {
                   </p>
 
                   <p className="text-muted-foreground">
-                    +977-98XXXXXXXX
+                    +977-9766987980
                   </p>
 
                 </div>
@@ -211,11 +211,11 @@ export default function Footer() {
                   </p>
 
                   <p className="text-muted-foreground">
-                    Sun - Fri
+                    Mon - Fri
                   </p>
 
                   <p className="text-muted-foreground">
-                    10:00 AM - 5:00 PM
+                    9:00 AM - 5:00 PM
                   </p>
 
                 </div>

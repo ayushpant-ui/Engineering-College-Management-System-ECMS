@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function ContactPreview() {
   return (
-    <section className="border-b border-border py-20">
+    <section className="border-b border-border py-16">
       <div className="mx-auto max-w-7xl px-6">
 
         <div className="overflow-hidden rounded-3xl border border-border bg-card">
@@ -51,10 +51,10 @@ export default function ContactPreview() {
                 details.
               </p>
 
-              <Button asChild size="lg">
+              <Button size="lg">
                 <Link href="/contact">
                   Contact Us
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 inline" />
                 </Link>
               </Button>
 
