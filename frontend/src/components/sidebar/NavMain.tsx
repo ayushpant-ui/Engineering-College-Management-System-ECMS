@@ -32,7 +32,10 @@ export default function NavMain() {
 >
   <Link
     href={item.url}
-    className="flex w-full cursor-pointer items-center gap-2"
+    className="flex w-full cursor-pointer items-center gap-2 hover:translate-x-1
+hover:bg-sidebar-accent
+transition-all
+duration-200"
   >
     <item.icon />
     <span>{item.title}</span>

@@ -11,7 +11,7 @@ import {
 
 export default function AppSidebar() {
   return (
-    <Sidebar>
+    <Sidebar >
 
       <SidebarHeader>
         <Logo />
