@@ -50,6 +50,7 @@ The project is designed using a scalable backend architecture with clear separat
 ### Backend
 
 * Node.js
+* Nest.js
 * Express.js
 * TypeScript
 * Prisma ORM

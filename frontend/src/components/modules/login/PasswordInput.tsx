@@ -18,7 +18,7 @@ interface PasswordInputProps {
 export default function PasswordInput({
   register,
   error,
-}: PasswordInputProps) {
+}: PasswordInputProps) { 
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -39,7 +39,7 @@ export default function PasswordInput({
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-primary transition"
+          className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-primary transition "
         >
           {showPassword ? (
             <EyeOff className="h-5 w-5" />

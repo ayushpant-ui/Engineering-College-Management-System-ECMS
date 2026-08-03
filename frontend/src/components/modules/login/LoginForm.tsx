@@ -116,7 +116,7 @@ export default function LoginForm() {
 
       <button
         disabled={loading}
-        className="flex h-11 w-full items-center justify-center rounded-xl bg-primary font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+        className="hover:cursor-pointer flex h-11 w-full items-center justify-center rounded-xl bg-primary font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {loading ? "Signing In..." : "Sign In"}
       </button>

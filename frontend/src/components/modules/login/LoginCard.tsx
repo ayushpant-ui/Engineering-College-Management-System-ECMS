@@ -63,7 +63,7 @@ export default function LoginCard() {
 
         <p className="mt-8 text-center text-sm text-muted-foreground">
           Having trouble signing in?
-          <button className="ml-2 font-medium text-primary hover:underline">
+          <button className="ml-2 font-medium text-primary hover:underline hover:cursor-pointer">
             Contact Administrator
           </button>
         </p>
