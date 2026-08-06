@@ -9,7 +9,7 @@ export const contactInfo = {
   email: "engineering@example.com",
   officeHours: [
     { days: "Monday – Friday", hours: "9:00 AM – 5:00 PM" },
-    { days: "Saturday", hours: "10:00 AM – 2:00 PM" },
+    // { days: "Saturday, Sunday", hours: "Closed" },
   ],
   socials: [
     { label: "Facebook", href: "https://facebook.com" },

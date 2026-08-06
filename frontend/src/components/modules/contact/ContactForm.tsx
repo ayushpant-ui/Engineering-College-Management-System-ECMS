@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, Send, TriangleAlert } from "lucide-react";
 import { contactSubjects } from "@/lib/contactdata";
-import { contactSchema, type ContactFormValues } from "@/lib/contact-schema";
+import { contactSchema, type ContactFormValues } from "@/lib/contactschema";
 
 type Status = "idle" | "success" | "error";
 

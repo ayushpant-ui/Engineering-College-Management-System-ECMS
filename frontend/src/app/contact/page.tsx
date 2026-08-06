@@ -1,4 +1,4 @@
-import ContactSection from "@/components/contact/ContactSection";
+import ContactSection from "@/components/modules/contact/ContactSection";
 
 export const metadata = {
   title: "Contact | School of Engineering",

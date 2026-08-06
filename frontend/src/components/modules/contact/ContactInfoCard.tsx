@@ -1,12 +1,13 @@
-
-import { Clock, Facebook, Linkedin, Youtube ,type LucideIcon } from "lucide-react";
+import { Clock } from "lucide-react";
+import { FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa";
+import type { IconType } from "react-icons";
 
 import { contactInfo } from "@/lib/contactdata";
 
-const socialIcons: Record<string, LucideIcon> = {
-  Facebook: Facebook,
-  LinkedIn: Linkedin,
-  YouTube: Youtube,
+const socialIcons: Record<string, IconType> = {
+  Facebook: FaFacebook,
+  LinkedIn: FaLinkedin,
+  YouTube: FaYoutube,
 };
 
 export default function ContactInfoCard() {
