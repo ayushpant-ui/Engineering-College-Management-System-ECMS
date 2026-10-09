@@ -51,20 +51,20 @@ export const departments: Department[] = [
     careers: ["Site Engineer", "Structural Designer", "Project Manager", "Government Engineer"],
   },
   {
-    slug: "electrical-engineering",
-    name: "Electrical Engineering",
-    code: "EE",
-    icon: "electrical",
+    slug: "architecture-engineering",
+    name: "Architecture Engineering",
+    code: "ARCH",
+    icon: "civil",
     shortDescription:
-      "Power systems, electronics and control for a connected, energy-driven world.",
+      "Designing and creating functional, sustainable buildings and spaces.",
     description:
-      "The Department of Electrical Engineering covers power generation and distribution, electrical machines, control systems, electronics and renewable energy, preparing graduates for the energy and industrial sectors.",
-    program: "B.E. Electrical Engineering",
+      "The Department of Architecture Engineering focuses on the design and planning of buildings and urban spaces, integrating aesthetics, functionality, and sustainability.",
+    program: "B.E. Architecture Engineering",
     duration: "4 Years (8 Semesters)",
     intake: 48,
-    facultyCount: 9,
-    labs: ["Machines Lab", "Electronics Lab", "Power Systems Lab", "Control Lab"],
-    careers: ["Power Engineer", "Electronics Engineer", "Maintenance Engineer", "Renewable Energy Specialist"],
+    facultyCount: 8,
+    labs: ["Design Lab", "Modeling Lab", "Construction Materials Lab", "Sustainability Lab"],
+    careers: ["Architect", "Urban Planner", "Interior Designer", "Sustainability Consultant"],
   },
 ];
 
