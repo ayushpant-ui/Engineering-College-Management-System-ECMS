@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Briefcase, Clock, FlaskConical, GraduationCap, Users } from "lucide-react";
-import { departments, getDepartmentBySlug } from "@/data/Departments";
+import { departments, getDepartmentBySlug } from "@/data/departments";
 import DepartmentIcon from "@/components/modules/departments/Departmenticon";
 
 export function generateStaticParams() {

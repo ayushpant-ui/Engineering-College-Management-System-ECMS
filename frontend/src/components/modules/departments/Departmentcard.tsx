@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, GraduationCap, Users } from "lucide-react";
-import type { Department } from "@/data/Departments";
+import type { Department } from "@/data/departments";
 import DepartmentIcon from "./Departmenticon";
 
 export default function DepartmentCard({ department }: { department: Department }) {

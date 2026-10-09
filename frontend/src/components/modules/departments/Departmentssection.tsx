@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Building2, Search } from "lucide-react";
-import { departments } from "@/data/Departments";
+import { departments } from "@/data/departments";
 import DepartmentCard from "./Departmentcard";
 
 export default function DepartmentsSection() {

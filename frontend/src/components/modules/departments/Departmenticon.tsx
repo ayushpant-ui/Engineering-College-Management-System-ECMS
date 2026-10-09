@@ -1,5 +1,5 @@
 import { Building2, Cog, Cpu, Zap } from "lucide-react";
-import type { DepartmentIconKey } from "@/data/Departments";
+import type { DepartmentIconKey } from "@/data/departments";
 
 const icons = {
   computer: Cpu,
