@@ -6,10 +6,9 @@ export interface FacultyMember {
   email: string;
   specialization: string[];
   qualification: string;
-  photoUrl?: string; // e.g. "/faculty/ram-sharma.jpg" in /public/faculty
+  photoUrl?: string; // in /public/faculty
 }
 
-// Placeholder data — replace with your real faculty.
 // Later: fetch from GET /api/v1/faculty (Prisma Faculty model).
 export const facultyMembers: FacultyMember[] = [
   {

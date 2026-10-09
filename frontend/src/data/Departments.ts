@@ -60,7 +60,7 @@ export const departments: Department[] = [
     description:
       "The Department of Architecture Engineering focuses on the design and planning of buildings and urban spaces, integrating aesthetics, functionality, and sustainability.",
     program: "B.E. Architecture Engineering",
-    duration: "4 Years (8 Semesters)",
+    duration: "5 Years (10 Semesters)",
     intake: 48,
     facultyCount: 8,
     labs: ["Design Lab", "Modeling Lab", "Construction Materials Lab", "Sustainability Lab"],
