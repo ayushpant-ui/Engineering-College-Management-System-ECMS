@@ -1,4 +1,4 @@
-export type DepartmentIconKey = "computer" | "civil" | "electrical" | "mechanical";
+export type DepartmentIconKey = "computer" | "civil"  | "mechanical";
 
 export interface Department {
   slug: string;
@@ -15,7 +15,7 @@ export interface Department {
   careers: string[];
 }
 
-// Placeholder content — replace with your real department details.
+
 // Later you can fetch this shape from the backend (GET /api/v1/departments).
 export const departments: Department[] = [
   {
