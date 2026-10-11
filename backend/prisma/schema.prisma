@@ -1,8 +1,16 @@
-model Contact { 
-  id Int  @id @default(autoincrement())
-  fullName string 
-  email string 
-  subject string
-  message string 
-  createdAt DateTime @default(now()) 
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  fullName  String
+  email     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
 }
