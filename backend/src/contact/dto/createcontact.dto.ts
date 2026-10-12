@@ -11,7 +11,6 @@ export enum ContactSubject{
 export class CreateContactDTO { 
 
   @IsString()
-  @IsEmpty()
   @MinLength(2)
   @MaxLength(50)
   fullName! : string ;
