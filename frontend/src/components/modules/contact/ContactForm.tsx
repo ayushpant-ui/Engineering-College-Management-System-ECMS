@@ -28,17 +28,38 @@ export default function ContactForm() {
   const messageLength = watch("message")?.length ?? 0;
 
   const onSubmit = async (values: ContactFormValues) => {
-    setStatus("idle");
-    try {
-      // Replace with your real endpoint, e.g.
-      // await fetch("/api/contact", { method: "POST", body: JSON.stringify(values) })
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      setStatus("success");
-      reset();
-    } catch {
-      setStatus("error");
+  console.log("Form submitted:", values);
+  setStatus("idle");
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/contact`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        typeof result.message === "string"
+          ? result.message
+          : "Failed to send your message."
+      );
     }
-  };
+
+    setStatus("success");
+    reset();
+  } catch (error) {
+    console.error("Contact form submission failed:", error);
+    setStatus("error");
+  }
+};
 
   const inputBase =
     "w-full rounded-lg border bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-colors";
