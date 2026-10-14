@@ -14,3 +14,26 @@ model Contact {
   message   String
   createdAt DateTime @default(now())
 }
+
+model Student{
+id Int @id @default(autoincrement())
+registrationNumber  String @unique 
+fullName String 
+department String 
+semester Int 
+account ?
+}
+
+model StudentAccount{
+id Int @id @default(autoincrement())
+studentid Int @unique 
+passwordHash string 
+mustChangePassword Boolean @default(true)
+
+
+ student             Student  @relation(
+    fields: [studentId],
+    references: [id],
+    onDelete: Cascade
+  )
+}
