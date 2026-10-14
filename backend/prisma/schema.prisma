@@ -15,25 +15,20 @@ model Contact {
   createdAt DateTime @default(now())
 }
 
-model Student{
-id Int @id @default(autoincrement())
-registrationNumber  String @unique 
-fullName String 
-department String 
-semester Int 
-account ?
+model Student {
+  id                 Int             @id @default(autoincrement())
+  registrationNumber String          @unique
+  fullName           String
+  department         String
+  semester           Int
+  account            StudentAccount?
 }
 
-model StudentAccount{
-id Int @id @default(autoincrement())
-studentid Int @unique 
-passwordHash string 
-mustChangePassword Boolean @default(true)
+model StudentAccount {
+  id                 Int      @id @default(autoincrement())
+  studentId          Int      @unique
+  passwordHash       String
+  mustChangePassword Boolean  @default(true)
 
-
- student             Student  @relation(
-    fields: [studentId],
-    references: [id],
-    onDelete: Cascade
-  )
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
