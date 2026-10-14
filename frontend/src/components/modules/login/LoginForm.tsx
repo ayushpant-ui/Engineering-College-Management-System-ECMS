@@ -64,12 +64,12 @@ export default function LoginForm() {
       <div>
 
         <label className="mb-2 block text-sm font-medium">
-          Email Address
+          Registration Number 
         </label>
 
         <input
-          type="email"
-          placeholder="Enter your email"
+          type="text"
+          placeholder="Enter your Registration Number"
           {...register("email")}
           className="h-11 w-full rounded-xl border border-border bg-background px-4 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
         />
