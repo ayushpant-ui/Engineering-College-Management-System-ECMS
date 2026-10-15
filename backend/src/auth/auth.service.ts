@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto } from './dto/authlogin.dto';
@@ -14,7 +13,7 @@ export class AuthService {
 
   async studentLogin(dto: AuthLoginDto) {
     //finding student using registration number
-    const student = await this.prisma.Student.findUnique({
+    const student = await this.prisma.student.findUnique({
       where: {
         registrationNumber: dto.registrationNumber,
       },
@@ -31,7 +30,7 @@ export class AuthService {
     //comparing the frontend password with the hashed  password store in database
     const checkpassword = await bcrypt.compare(
       dto.password,
-      student.account.hashPassword,
+      student.account.passwordHash,
     );
     // if the password is incorrect
     if (!checkpassword) {
@@ -51,7 +50,7 @@ export class AuthService {
 
     return {
       message: 'Login successfull',
-      token: accesstoken,
+     accesstoken,
       student: {
         id: student.id,
         registrationNumber: student.registrationNumber,
