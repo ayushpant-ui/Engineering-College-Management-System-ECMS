@@ -14,7 +14,7 @@ export class AuthService {
 
   async studentLogin(dto: AuthLoginDto) {
     //finding student using registration number
-    const student = await this.prisma.student.findUnique({
+    const student = await this.prisma.Student.findUnique({
       where: {
         registrationNumber: dto.registrationNumber,
       },
