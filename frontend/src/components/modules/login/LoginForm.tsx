@@ -10,7 +10,10 @@ import { z } from "zod";
 import PasswordInput from "./PasswordInput";
 
 const loginSchema = z.object({
-  registrationNumber: z.string().trim().min(1, "Registration Number is required."),
+  registrationNumber: z
+    .string()
+    .trim()
+    .min(1, "Registration Number is required."),
   password: z.string().min(6, "Password must be at least 6 characters."),
   remember: z.boolean().optional(),
 });
@@ -31,47 +34,81 @@ export default function LoginForm() {
     defaultValues: { registrationNumber: "", password: "", remember: false },
   });
 
-  async function onSubmit({ registrationNumber, password, remember }: LoginFormData) {
+  async function onSubmit({
+    registrationNumber,
+    password,
+    remember,
+  }: LoginFormData) {
     setLoading(true);
     setServerError("");
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/student/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ registrationNumber, password }),
-      });
+      let response: Response;
+      try {
+        response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/student/login`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ registrationNumber, password }),
+          },
+        );
+      } catch {
+        setServerError(
+          "Could not reach the server. Check your connection and try again.",
+        );
+        return;
+      }
 
       const result = await response.json();
 
       if (!response.ok) {
-        // Nest sends { message: "Invalid credentials." } (or an array for validation errors)
-        const message = Array.isArray(result.message) ? result.message[0] : result.message;
+        const message = Array.isArray(result.message)
+          ? result.message[0]
+          : result.message;
         setServerError(message || "Login failed. Please try again.");
         return;
       }
 
-      // Backend wraps successful responses as { success: true, data: {...} }
-      const { accessToken, user } = result.data;
+      // Works whether the backend returns { data: {...} } or the object directly
+      const payload = result.data ?? result;
+      const accessToken =
+        payload.accessToken ??
+        payload.accesstoken ??
+        payload.access_token ??
+        payload.token;
 
-      // "Remember me" keeps the session after the browser closes.
-      // TODO: for production, prefer an httpOnly cookie set by the server.
+      if (!accessToken) {
+        console.error("Unexpected login response:", result);
+        setServerError(
+          "Login succeeded but the server response was unexpected.",
+        );
+        return;
+      }
+
       const storage = remember ? localStorage : sessionStorage;
       storage.setItem("accessToken", accessToken);
-      storage.setItem("user", JSON.stringify(user));
+      storage.setItem(
+        "user",
+        JSON.stringify(payload.student ?? payload.user ?? {}),
+      );
 
-      router.push("/dashboard");
-    } catch {
-      setServerError("Could not reach the server. Check your connection and try again.");
+      router.push("/student/dashboard");
+    } catch (err) {
+      console.error("Login error:", err);
+      setServerError("Something went wrong. Please try again.");
     } finally {
-      setLoading(false); // always runs, so the button never gets stuck
+      setLoading(false);
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <div>
-        <label htmlFor="registrationNumber" className="mb-2 block text-sm font-medium">
+        <label
+          htmlFor="registrationNumber"
+          className="mb-2 block text-sm font-medium"
+        >
           Registration Number
         </label>
         <input
@@ -83,7 +120,9 @@ export default function LoginForm() {
           className="h-11 w-full rounded-xl border border-border bg-background px-4 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
         />
         {errors.registrationNumber && (
-          <p className="mt-1 text-sm text-red-500">{errors.registrationNumber.message}</p>
+          <p className="mt-1 text-sm text-red-500">
+            {errors.registrationNumber.message}
+          </p>
         )}
       </div>
 
@@ -94,14 +133,20 @@ export default function LoginForm() {
           <input type="checkbox" {...register("remember")} />
           Remember Me
         </label>
-        <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+        <Link
+          href="/forgot-password"
+          className="text-sm text-primary hover:underline"
+        >
           Forgot Password?
         </Link>
       </div>
 
       {/* Server error */}
       {serverError && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3.5 py-2.5 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400">
+        <p
+          role="alert"
+          className="rounded-lg bg-red-50 px-3.5 py-2.5 text-sm text-red-600 dark:bg-red-500/10 dark:text-red-400"
+        >
           {serverError}
         </p>
       )}

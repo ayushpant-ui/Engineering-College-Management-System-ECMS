@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { UseFormRegister } from "react-hook-form";
 
 type LoginFormData = {
-  email: string;
+  registrationNumber: string;
   password: string;
   remember?: boolean;
 };
