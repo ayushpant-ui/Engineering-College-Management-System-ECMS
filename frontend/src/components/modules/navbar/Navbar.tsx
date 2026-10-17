@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import Logo from "@/components/sidebar/Logo";
 import ThemeToggle from "@/components/modules/navbar/ThemeToggle";
+import UserMenu from "./UserMenu";
 
 export default function Navbar() {
   return (
@@ -38,13 +39,15 @@ export default function Navbar() {
         <ThemeToggle />
 
         {/* Login */}
-<Link href="/login" 
+{/* <Link href="/login" 
 className="cursor-pointer">
   <Button className='cursor-pointer'>
     <LogIn className="mr-2 h-4 w-4 " />
     Login
   </Button>
-</Link>
+</Link> */}
+
+        <UserMenu />
 
       </div>
 
