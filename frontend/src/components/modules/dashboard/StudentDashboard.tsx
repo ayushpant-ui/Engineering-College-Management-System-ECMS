@@ -33,7 +33,7 @@ const quickLinks = [
 ];
 
 function readSession(): StudentUser | null {
-  // Login stores in localStorage (Remember Me) or sessionStorage.
+  
   const storage = localStorage.getItem("accessToken") ? localStorage : sessionStorage;
   const token = storage.getItem("accessToken");
   const raw = storage.getItem("user");
