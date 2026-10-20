@@ -13,8 +13,7 @@ export const metadata: Metadata = {
   description: "School of Engineering Portal",
 };
 
-// Root layout is now minimal. The public sidebar/navbar/footer moved into
-// components/layouts/SiteShell.tsx so the admin area can have its own chrome.
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
