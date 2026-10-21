@@ -61,27 +61,5 @@ export class AuthService {
       },
     };
   }
-   // Admin login with email. Only users with the ADMIN role can use this endpoint.
-  async adminLogin({ email, password }: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    return this.verifyAndIssue(user && user.role === Role.ADMIN ? user : null, password);
-  }
- 
-  private async verifyAndIssue(
-    user: User | null,
-    password: string,
-    profile: Record<string, unknown> = {}
-  ) {
-    // Same message for every failure so attackers can't tell which part was wrong.
-    if (!user || !user.isActive || !(await bcrypt.compare(password, user.passwordHash))) {
-      throw new UnauthorizedException("Invalid credentials.");
-    }
- 
-    const payload = { sub: user.id, email: user.email, role: user.role };
-    return {
-      accessToken: this.jwt.sign(payload),
-      user: { id: user.id, email: user.email, role: user.role, ...profile },
-    };
-  }
 }
-
+   

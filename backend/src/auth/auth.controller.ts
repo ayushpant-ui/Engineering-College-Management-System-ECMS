@@ -15,12 +15,4 @@ export class AuthController {
         return this.authService.studentLogin(dto);
     }
 
-    // Admin-only login. Limited to 5 attempts per minute per IP to slow down password guessing.
-  @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 60000 } })
-  @Post("admin/login")
-  @HttpCode(HttpStatus.OK)
-  adminLogin(@Body() dto: AuthLoginDto) {
-    return this.authService.adminLogin(dto);
-  }
 }
