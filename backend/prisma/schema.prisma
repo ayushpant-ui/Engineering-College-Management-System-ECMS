@@ -32,3 +32,9 @@ model StudentAccount {
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
+
+model Admin {
+  id           Int    @id @default(autoincrement())
+  email        String @unique
+  passwordHash String
+}
