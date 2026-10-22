@@ -8,6 +8,7 @@ export class AdminAuthController {
   constructor(private readonly authService: AdminAuthService) {}
 
   // Max 5 attempts per minute per IP to slow down password guessing.
+  
   @UseGuards(ThrottlerGuard)
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post("login")

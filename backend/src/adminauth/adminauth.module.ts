@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule, JwtSignOptions } from "@nestjs/jwt";
 import { PrismaModule } from "../../prisma/prisma.module";
 import { AdminAuthController } from "./adminauth.controller";
 import { AdminStatsController } from "./admin-stats.controller";
@@ -14,7 +14,9 @@ import { AdminGuard } from "./admin.guard";
         if (!secret) throw new Error("JWT_ADMIN_SECRET is not set in .env");
         return {
           secret,
-          signOptions: { expiresIn: process.env.JWT_ADMIN_EXPIRES_IN ?? "30m" },
+          signOptions: {
+            expiresIn: (process.env.JWT_ADMIN_EXPIRES_IN ?? "30m") as JwtSignOptions["expiresIn"],
+          },
         };
       },
     }),
@@ -23,4 +25,5 @@ import { AdminGuard } from "./admin.guard";
   controllers: [AdminAuthController, AdminStatsController],
   providers: [AdminAuthService, AdminGuard],
 })
+
 export class AdminModule {}

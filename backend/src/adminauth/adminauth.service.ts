@@ -9,7 +9,7 @@ import { AdminLoginDto } from "./dto/adminlogin.dto";
 const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 12);
 
 @Injectable()
-export class AdminAuthService {
+export class AdminAuthService{
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService

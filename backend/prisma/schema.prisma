@@ -34,7 +34,13 @@ model StudentAccount {
 }
 
 model Admin {
-  id           Int    @id @default(autoincrement())
-  email        String @unique
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
   passwordHash String
+  fullName     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("admins")
 }
