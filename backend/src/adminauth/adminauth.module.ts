@@ -26,4 +26,4 @@ import { AdminGuard } from "./admin.guard";
   providers: [AdminAuthService, AdminGuard],
 })
 
-export class AdminModule {}
+export class AdminAuthModule {}
