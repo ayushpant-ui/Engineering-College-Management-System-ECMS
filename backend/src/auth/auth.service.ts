@@ -65,6 +65,7 @@ export class AuthService {
       },
     };
   }
+  
   async changeStudentPassword(studentId: number, dto: ChangePasswordDto) {
     const account = await this.prisma.studentAccount.findUnique({
       where: {
