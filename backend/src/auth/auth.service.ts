@@ -3,12 +3,16 @@ import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto } from './dto/authlogin.dto';
+import { ChangePasswordDto } from './dto/changepassworddto';
+import { JwtAuthGuard } from './jwt-authguard';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private jwtAuthGuard: JwtAuthGuard,
   ) {}
 
   async studentLogin(dto: AuthLoginDto) {
@@ -50,7 +54,7 @@ export class AuthService {
 
     return {
       message: 'Login successfull',
-     accesstoken,
+      accesstoken,
       student: {
         id: student.id,
         registrationNumber: student.registrationNumber,
@@ -61,5 +65,51 @@ export class AuthService {
       },
     };
   }
+  async changeStudentPassword(studentId: number, dto: ChangePasswordDto) {
+    const account = await this.prisma.studentAccount.findUnique({
+      where: {
+        studentId,
+      },
+    });
+
+    if (!account) {
+      throw new UnauthorizedException('Student account not found.');
+    }
+
+    const currentPasswordMatches = await bcrypt.compare(
+      dto.currentPassword,
+      account.passwordHash,
+    );
+
+    if (!currentPasswordMatches) {
+      throw new UnauthorizedException('Current password is incorrect.');
+    }
+
+    const newPasswordIsSame = await bcrypt.compare(
+      dto.newPassword,
+      account.passwordHash,
+    );
+
+    if (newPasswordIsSame) {
+      throw new BadRequestException(
+        'Your new password must be different from your current password.',
+      );
+    }
+
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, 12);
+
+    await this.prisma.studentAccount.update({
+      where: {
+        studentId,
+      },
+      data: {
+        passwordHash: newPasswordHash,
+        mustChangePassword: false,
+      },
+    });
+
+    return {
+      message: 'Password changed successfully.',
+    };
+  }
 }
-   
