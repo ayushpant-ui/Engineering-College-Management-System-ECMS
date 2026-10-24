@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private jwtAuthGuard: JwtAuthGuard,
+    // private jwtAuthGuard: JwtAuthGuard,
   ) {}
 
   async studentLogin(dto: AuthLoginDto) {
