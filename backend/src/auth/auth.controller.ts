@@ -4,6 +4,7 @@ import { AuthLoginDto } from './dto/authlogin.dto';
 import { Throttle, ThrottlerGuard } from "@nestjs/throttler";
 import { ChangePasswordDto } from './dto/changepassworddto';
 import { JwtAuthGuard } from './jwt-authguard';
+import type { AuthenticatedRequest } from './jwt-authguard';
 
 @Controller('auth')
 export class AuthController {

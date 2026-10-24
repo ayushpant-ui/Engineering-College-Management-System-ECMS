@@ -128,7 +128,7 @@ export default function ChangePasswordForm() {
         response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/student/change-password`,
           {
-            method: "POST",
+            method: "PATCH",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${session.token}`,
