@@ -22,7 +22,9 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context
+      .switchToHttp()
+      .getRequest<AuthenticatedRequest>();
 
     const authorization = request.headers.authorization;
 
@@ -36,24 +38,26 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authentication required.');
     }
 
+    let payload: StudentJwtPayload;
+
     try {
-      const payload =
+      payload =
         await this.jwtService.verifyAsync<StudentJwtPayload>(token);
-
-      if (
-        typeof payload.sub !== 'number' ||
-        payload.role !== 'student'
-      ) {
-        throw new UnauthorizedException('Invalid access token.');
-      }
-
-      (request as AuthenticatedRequest).user = payload;
-
-      return true;
     } catch {
       throw new UnauthorizedException(
         'Invalid or expired access token.',
       );
     }
+
+    if (
+      typeof payload.sub !== 'number' ||
+      payload.role !== 'student'
+    ) {
+      throw new UnauthorizedException('Invalid access token.');
+    }
+
+    request.user = payload;
+
+    return true;
   }
 }

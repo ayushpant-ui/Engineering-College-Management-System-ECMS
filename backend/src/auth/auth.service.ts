@@ -43,18 +43,18 @@ export class AuthService {
 
     // creating JWT token payload
     const payload = {
-      id: student.id,
+      sub: student.id,
       registrationNumber: student.registrationNumber,
       role: 'student',
     };
     // signing the payload to create a JWT token
-    const accesstoken = this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload);
 
     // returning the token and student info
 
     return {
       message: 'Login successfull',
-      accesstoken,
+      accessToken,
       student: {
         id: student.id,
         registrationNumber: student.registrationNumber,
