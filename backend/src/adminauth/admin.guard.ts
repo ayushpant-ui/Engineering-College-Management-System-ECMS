@@ -20,7 +20,7 @@ export class AdminGuard implements CanActivate {
 
     if (!token) throw new UnauthorizedException("Missing token.");
 
-    let payload: { id: number; email: string; role: string };
+    let payload: { sub: number; email: string; role: string };
     try {
       payload = await this.jwt.verifyAsync(token);
     } catch {

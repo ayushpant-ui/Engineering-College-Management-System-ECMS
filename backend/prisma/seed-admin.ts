@@ -1,9 +1,17 @@
-
 import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
-const prisma = new PrismaClient();
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is missing. Check that .env is in the folder you run this from.");
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 async function main() {
   const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
@@ -20,7 +28,7 @@ async function main() {
 
   await prisma.admin.upsert({
     where: { email },
-    update: {}, // never overwrite an existing admin's password
+    update: {},          // this never overwrite an existing admin's password
     create: { email, passwordHash, fullName: "Administrator" },
   });
 
