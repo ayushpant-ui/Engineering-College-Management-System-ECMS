@@ -1,18 +1,18 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import * as bcrypt from "bcrypt";
-import { PrismaService } from "../../prisma/prisma.service";
-import { AdminLoginDto } from "./dto/adminlogin.dto";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../../prisma/prisma.service';
+import { AdminLoginDto } from './dto/adminlogin.dto';
 
 // Compared against when the email doesn't exist, so "unknown email" and
 // "wrong password" take the same time and can't be told apart.
-const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 12);
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 12);
 
 @Injectable()
-export class AdminAuthService{
+export class AdminAuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
   ) {}
 
   async login({ email, password }: AdminLoginDto) {
@@ -20,22 +20,30 @@ export class AdminAuthService{
       where: { email: email.trim().toLowerCase() },
     });
 
-    const passwordOk = await bcrypt.compare(password, admin?.passwordHash ?? DUMMY_HASH);
+    const passwordOk = await bcrypt.compare(
+      password,
+      admin?.passwordHash ?? DUMMY_HASH,
+    );
 
     if (!admin || !admin.isActive || !passwordOk) {
-      throw new UnauthorizedException("Invalid credentials.");
+      throw new UnauthorizedException('Invalid credentials.');
     }
 
     const accessToken = await this.jwt.signAsync({
-      id: admin.id,
+      id: String(admin.id),
       email: admin.email,
-      role: "admin",
+      role: 'ADMIN',
     });
 
     return {
-      message: "Login successful",
+      message: 'Login successful',
       accessToken,
-      user: { id: admin.id, email: admin.email, fullName: admin.fullName, role: "admin" },
+      user: {
+        id: String(admin.id),
+        email: admin.email,
+        fullName: admin.fullName,
+        role: 'ADMIN',
+      },
     };
   }
 }
