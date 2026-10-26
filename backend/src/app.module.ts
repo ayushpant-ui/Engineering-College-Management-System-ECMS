@@ -9,6 +9,7 @@ import { ContactModule } from './contact/contact.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AdminAuthModule } from './adminauth/adminauth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { NoticesModule } from './notices/notices.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ContactModule,
     PrismaModule,
     AdminAuthModule,
+    NoticesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
