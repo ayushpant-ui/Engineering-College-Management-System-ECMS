@@ -14,12 +14,12 @@ export class CreateNoticeDto {
   @IsString()
   @MinLength(1)
   @MaxLength(200)
-  title: string;
+  title!: string;
 
   @IsString()
   @MinLength(1)
   @MaxLength(5000)
-  body: string;
+  body!: string;
 
   @IsOptional()
   @IsEnum(NoticeCategory)
