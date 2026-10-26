@@ -51,7 +51,7 @@ export function getAdminSession(): AdminSession | null {
   //   return null;
   // }
 
-  const payload = decodePayload(token);
+const payload = decodePayload(token);
 
 console.log("Admin JWT payload:", payload);
 
