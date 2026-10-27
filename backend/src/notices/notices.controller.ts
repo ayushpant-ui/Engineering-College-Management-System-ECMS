@@ -1,4 +1,13 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from "@nestjs/common";
+import { NoticesService } from "./notices.service";
 
-@Controller('notices')
-export class NoticesController {}
+// Public endpoint used by the website's Notices page.
+@Controller("notices")
+export class NoticesController {
+  constructor(private readonly noticesService: NoticesService) {}
+
+  @Get()
+  findPublic() {
+    return this.noticesService.findPublic();
+  }
+}

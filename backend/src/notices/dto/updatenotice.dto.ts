@@ -1,7 +1,8 @@
-import { NoticeCategory } from "@prisma/client";
+import { NOTICE_CATEGORIES } from "../noticecategory";
+import type { NoticeCategory } from "../noticecategory";
 import {
   IsBoolean,
-  IsEnum,
+  IsIn,
   IsOptional,
   IsString,
   Matches,
@@ -25,7 +26,7 @@ export class UpdateNoticeDto {
   body?: string;
 
   @IsOptional()
-  @IsEnum(NoticeCategory)
+  @IsIn(NOTICE_CATEGORIES)
   category?: NoticeCategory;
 
   @ValidateIf((o) => o.attachmentUrl !== undefined && o.attachmentUrl !== "")

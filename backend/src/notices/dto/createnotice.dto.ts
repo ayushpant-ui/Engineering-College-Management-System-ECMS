@@ -1,7 +1,8 @@
-import { NoticeCategory } from "@prisma/client";
+import { NOTICE_CATEGORIES } from "../noticecategory";
+import type { NoticeCategory } from "../noticecategory";
 import {
   IsBoolean,
-  IsEnum,
+  IsIn,
   IsOptional,
   IsString,
   Matches,
@@ -22,7 +23,7 @@ export class CreateNoticeDto {
   body!: string;
 
   @IsOptional()
-  @IsEnum(NoticeCategory)
+  @IsIn(NOTICE_CATEGORIES)
   category?: NoticeCategory;
 
   // Empty string / missing = no attachment. Otherwise must look like a link or a /public path.

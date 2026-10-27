@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { NoticeCategory, Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CreateNoticeDto } from "./dto/createnotice.dto";
 import { UpdateNoticeDto } from "./dto/updatenotice.dto";
+import { isNoticeCategory } from "./noticecategory";
 
 interface ListParams {
   page: number;
@@ -34,9 +35,7 @@ export class NoticesService {
 
   // ── Admin: everything, with search / filter / pagination ──
   async list({ page, limit, search, category }: ListParams) {
-    const validCategory = Object.values(NoticeCategory).includes(category as NoticeCategory)
-      ? (category as NoticeCategory)
-      : undefined;
+    const validCategory = isNoticeCategory(category) ? category : undefined;
 
     const where: Prisma.NoticeWhereInput = {
       ...(validCategory ? { category: validCategory } : {}),
@@ -68,7 +67,7 @@ export class NoticesService {
       data: {
         title: dto.title.trim(),
         body: dto.body.trim(),
-        category: dto.category ?? NoticeCategory.GENERAL,
+        category: dto.category ?? "GENERAL",
         attachmentUrl: dto.attachmentUrl || null,
         isPinned: dto.isPinned ?? false,
         isPublished: dto.isPublished ?? true,
