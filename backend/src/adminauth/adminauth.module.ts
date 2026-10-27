@@ -24,6 +24,7 @@ import { AdminGuard } from "./admin.guard";
   ],
   controllers: [AdminAuthController, AdminStatsController],
   providers: [AdminAuthService, AdminGuard],
+  exports: [AdminGuard, JwtModule],
 })
 
 export class AdminAuthModule {}

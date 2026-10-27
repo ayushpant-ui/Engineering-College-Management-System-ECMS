@@ -6,7 +6,7 @@ export const contactInfo = {
     mapQuery: "Far Western University Kanchanpur Nepal",
   },
   phone: "+977-9766987980",
-  email: "engineering@example.com",
+  email: "ayushpant2073@gmail.com",
   officeHours: [
     { days: "Monday – Friday", hours: "9:00 AM – 5:00 PM" },
     // { days: "Saturday, Sunday", hours: "Closed" },

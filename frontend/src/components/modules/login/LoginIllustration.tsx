@@ -6,8 +6,7 @@ import { GraduationCap, BookOpen, Users } from "lucide-react";
 
 export default function LoginIllustration() {
   return (
-    <div className="relative flex h-full w-full overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700">
-
+    <div className="relative flex h-full w-full overflow-hidden bg-gradient-to-br from-[#111827] via-[#172554] to-[#1e3a5f]">
       {/* Background Image */}
       {/* <Image
         src="/login/engineering.jpg"
@@ -18,7 +17,7 @@ export default function LoginIllustration() {
       /> */}
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-slate-950/15" />
 
       {/* Content */}
       <motion.div
@@ -29,21 +28,18 @@ export default function LoginIllustration() {
       >
         {/* Logo */}
         <div className="mb-8 flex items-center gap-3">
-
-          <div className="rounded-2xl bg-white/20 p-4 backdrop-blur">
+          {/* <div className="rounded-2xl bg-white/20 p-4 backdrop-blur">
+            <GraduationCap className="h-9 w-9" />
+          </div> */}
+          <div className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
             <GraduationCap className="h-9 w-9" />
           </div>
 
           <div>
-            <h1 className="text-3xl font-bold">
-              School of Engineering
-            </h1>
+            <h1 className="text-3xl font-bold">School of Engineering</h1>
 
-            <p className="text-blue-100">
-              Far Western University
-            </p>
+            <p className="text-blue-100">Far Western University</p>
           </div>
-
         </div>
 
         {/* Heading */}
@@ -52,45 +48,35 @@ export default function LoginIllustration() {
         </h2>
 
         <p className="mt-6 max-w-lg text-lg leading-8 text-blue-100">
-          Access notices, results, attendance, faculty information,
-          academic resources, and administrative services from one
-          secure platform.
+          Access notices, results, attendance, faculty information, academic
+          resources, and administrative services from one secure platform.
         </p>
 
         {/* Features */}
         <div className="mt-12 space-y-6">
-
           <div className="flex items-center gap-4">
             <BookOpen className="h-7 w-7" />
-            <span className="text-lg">
-              Academic Resources
-            </span>
+            <span className="text-lg">Academic Resources</span>
           </div>
 
           <div className="flex items-center gap-4">
             <Users className="h-7 w-7" />
-            <span className="text-lg">
-              Student & Faculty Portal
-            </span>
+            <span className="text-lg">Student & Faculty Portal</span>
           </div>
 
           <div className="flex items-center gap-4">
             <GraduationCap className="h-7 w-7" />
-            <span className="text-lg">
-              Secure University Access
-            </span>
+            <span className="text-lg">Secure University Access</span>
           </div>
-
         </div>
-
       </motion.div>
 
       {/* Decorative Circles */}
 
-      <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+      {/* Decorative blue glow */}
+      <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-blue-500/15 blur-3xl" />
 
-      <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl" />
-
+      <div className="absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-indigo-400/10 blur-3xl" />
     </div>
   );
 }
