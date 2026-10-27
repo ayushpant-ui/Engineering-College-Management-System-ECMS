@@ -45,27 +45,27 @@ export function getAdminSession(): AdminSession | null {
   const rawUser = sessionStorage.getItem(USER_KEY);
   if (!token || !rawUser) return null;
 
-  // const payload = decodePayload(token);
-  // if (!payload?.exp || payload.role !== "ADMIN" || payload.exp * 1000 < Date.now()) {
-  //   clearAdminSession();
-  //   return null;
-  // }
+  const payload = decodePayload(token);
+  if (!payload?.exp || payload.role !== "ADMIN" || payload.exp * 1000 < Date.now()) {
+    clearAdminSession();
+    return null;
+  }
 
-const payload = decodePayload(token);
+// const payload = decodePayload(token);
 
-console.log("Admin JWT payload:", payload);
+// console.log("Admin JWT payload:", payload);
 
-if (!payload?.exp) {
-  console.error("Admin token is missing its expiration claim.");
-  clearAdminSession();
-  return null;
-}
+// if (!payload?.exp) {
+//   console.error("Admin token is missing its expiration claim.");
+//   clearAdminSession();
+//   return null;
+// }
 
-if (payload.role !== "ADMIN") {
-  console.error("Unexpected admin role:", payload.role);
-  clearAdminSession();
-  return null;
-}
+// if (payload.role !== "ADMIN") {
+//   console.error("Unexpected admin role:", payload.role);
+//   clearAdminSession();
+//   return null;
+// }
 
 if (payload.exp * 1000 < Date.now()) {
   console.error("Admin token has expired.");

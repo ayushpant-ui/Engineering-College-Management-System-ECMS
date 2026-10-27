@@ -28,11 +28,27 @@ export async function adminFetch<T = unknown>(path: string, init: RequestInit = 
   }
 
   // Expired or non-admin token: end the session and go back to the login page
-  if (response.status === 401 || response.status === 403) {
-    clearAdminSession();
-    window.location.assign("/admin/login");
-    throw new AdminApiError("Your session has ended. Please sign in again.", response.status);
-  }
+  // if (response.status === 401 || response.status === 403) {
+  //   clearAdminSession();
+  //   window.location.assign("/admin/login");
+  //   throw new AdminApiError("Your session has ended. Please sign in again.", response.status);
+  // }
+  if (response.status === 401) {
+  clearAdminSession();
+  window.location.assign("/admin/login");
+
+  throw new AdminApiError(
+    "Your session is invalid or has expired. Please sign in again.",
+    401,
+  );
+}
+
+if (response.status === 403) {
+  throw new AdminApiError(
+    "You don't have permission to access this resource.",
+    403,
+  );
+}
 
   const body = await response.json().catch(() => null);
 

@@ -27,7 +27,7 @@ export class AdminGuard implements CanActivate {
       throw new UnauthorizedException("Invalid or expired token.");
     }
 
-    if (payload.role !== "admin") throw new ForbiddenException("Admins only.");
+    if (payload.role !== "ADMIN") throw new ForbiddenException("Admins only.");
 
     request.admin = payload; // available in controllers as @Req() req.admin
     return true;
