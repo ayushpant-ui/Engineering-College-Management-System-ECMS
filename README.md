@@ -1,6 +1,7 @@
 
 # [Currently working on it ]
 # Engineering College Management System (ECMS) 
+<h3 align='center'>LoginPage</h3>
 <p align="center">
   <img
     src="./frontend/public/images/Login.png"
@@ -8,9 +9,18 @@
     width="100%"
   />
 </p>
+<h3 align='center'>Authenticated Student Dashboard</h3>
 <p align="center">
   <img
     src="./frontend/public/images/ECMS-Demo.png"
+    alt="Engineering College Management System Homepage"
+    width="100%"
+  />
+</p>
+<h3 align='center'>AdminPanel</h3>
+<p align="center">
+  <img
+    src="./frontend/public/images/AdminPanel.png"
     alt="Engineering College Management System Homepage"
     width="100%"
   />

@@ -51,7 +51,7 @@ const sections = [
   {
     label: "Content",
     items: [
-      { label: "Notices", href: "/admin/notices", icon: Bell, enabled: false },
+      { label: "Notices", href: "/admin/notices", icon: Bell, enabled: true },
       { label: "Events", href: "/admin/events", icon: CalendarDays, enabled: false },
       { label: "Gallery", href: "/admin/gallery", icon: Images, enabled: false },
       { label: "Messages", href: "/admin/messages", icon: MessageSquare, enabled: false },
