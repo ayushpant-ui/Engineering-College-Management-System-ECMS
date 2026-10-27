@@ -3,6 +3,13 @@
 # Engineering College Management System (ECMS) 
 <p align="center">
   <img
+    src="./frontend/public/images/Login.png"
+    alt="Login Page"
+    width="100%"
+  />
+</p>
+<p align="center">
+  <img
     src="./frontend/public/images/ECMS-Demo.png"
     alt="Engineering College Management System Homepage"
     width="100%"
