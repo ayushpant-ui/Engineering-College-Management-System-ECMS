@@ -6,7 +6,7 @@ import { AdminNoticesController } from "./adminnoticescontroller";
 import { NoticesService } from "./notices.service";
 
 @Module({
-  imports: [PrismaModule, AdminAuthModule], // AdminModule must export AdminGuard + JwtModule
+  imports: [PrismaModule, AdminAuthModule], 
   controllers: [NoticesController, AdminNoticesController],
   providers: [NoticesService],
 })

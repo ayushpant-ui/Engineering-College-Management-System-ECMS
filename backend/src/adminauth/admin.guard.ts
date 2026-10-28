@@ -20,7 +20,7 @@ export class AdminGuard implements CanActivate {
 
     if (!token) throw new UnauthorizedException("Missing token.");
 
-    let payload: { sub: number; email: string; role: string };
+    let payload: { id: number; email: string; role: string };
     try {
       payload = await this.jwt.verifyAsync(token);
     } catch {
@@ -30,6 +30,14 @@ export class AdminGuard implements CanActivate {
     if (payload.role !== "ADMIN") throw new ForbiddenException("Admins only.");
 
     request.admin = payload; // available in controllers as @Req() req.admin
+
+        // Token ids can arrive as strings ("1"), but the database ids are integers
+    const id = Number(payload.id);
+    if (!Number.isInteger(id)) throw new UnauthorizedException("Invalid token.");
+ 
+    request.admin = { ...payload, id }; // id is now always a number
     return true;
   }
 }
+  
+  
