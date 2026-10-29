@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AdminStudentsService } from './adminstudent.service';
-import { AdminstudentController } from './adminstudent.controller';
+import { AdminStudentController } from './adminstudent.controller';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AdminAuthModule } from '@/adminauth/adminauth.module';
 import { PrismaModule } from '../../prisma/prisma.module';
@@ -8,6 +8,6 @@ import { PrismaModule } from '../../prisma/prisma.module';
 @Module({
   imports : [AdminAuthModule,PrismaModule],
   providers: [AdminStudentsService],
-  controllers: [AdminstudentController]
+  controllers: [AdminStudentController]
 })
 export class AdminstudentModule {}
