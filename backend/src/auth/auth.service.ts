@@ -28,7 +28,7 @@ export class AuthService {
 
     //checking whether student registration number exists or not
     if (!student || !student.account) {
-      throw new Error('Invalid registration number or password');
+      throw new BadRequestException('Invalid registration number or password');
     }
 
     //comparing the frontend password with the hashed  password store in database
