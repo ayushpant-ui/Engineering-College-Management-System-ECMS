@@ -21,8 +21,10 @@ export class CreateStudentDto {
 export class UpdateStudentDto {
   @IsOptional() @IsString() @MinLength(1) @MaxLength(120) 
   fullName?: string;
+
   @IsOptional() @IsInt() @Min(1) @Max(12) 
   semester?: number;
+  
   @IsOptional() @IsString() @MinLength(1) @MaxLength(100) 
   department?: string;
 }
