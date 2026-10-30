@@ -18,7 +18,7 @@ import { adminFetch, AdminApiError } from "@/lib/admin-api";
 import { departmentName, type AdminStudent, type StudentList } from "@/lib/admin-students";
 import ConfirmReasonModal from "@/components/modules/admin/results/ConfirmReasonModal";
 import StudentFormModal from "./StudentFormModal";
-import TemporaryPasswordModal from "./TemporaryPasswordModal";
+import TemporaryPasswordModal from "./TemporaryPaswordModal";
 
 type Dialog =
   | { type: "none" }

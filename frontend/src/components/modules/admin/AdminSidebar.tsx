@@ -36,7 +36,7 @@ const sections = [
   {
     label: "People",
     items: [
-      { label: "Students", href: "/admin/students", icon: GraduationCap, enabled: false },
+      { label: "Students", href: "/admin/students", icon: GraduationCap, enabled: true },
       { label: "Faculty", href: "/admin/faculty", icon: Users, enabled: false },
     ],
   },

@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  BadRequestException
 } from "@nestjs/common";
 
 import type { Prisma } from "@prisma/client";
@@ -225,32 +226,31 @@ export class AdminStudentsService {
 
     return student;
   }
+
+ async remove(id: number, adminId: number) {
+  const student = await this.ensureExists(id);
+
+  // Check whether the student has any result records.
+  const resultCount = await this.prisma.result.count({
+    where: { studentId: id },
+  });
+
+  if (resultCount > 0) {
+    throw new BadRequestException(
+      `This student has ${resultCount} result record${
+        resultCount === 1 ? "" : "s"
+      } and can't be deleted.`,
+    );
+  }
+
+  await this.prisma.student.delete({
+    where: { id },
+  });
+
+  this.logger.warn(
+    `Admin ${adminId} deleted student ${student.registrationNumber}`,
+  );
+
+  return { message: "Student deleted." };
 }
-
-
-//  async remove(id: number, adminId: number) {
-//     const student = await this.ensureExists(id);
- 
-//     // Deleting a student would also delete their marks, so refuse.
-//     const resultCount = await this.prisma.result.count({ where: { studentId: id } });
-//     if (resultCount > 0) {
-//       throw new BadRequestException(
-//         `This student has ${resultCount} result record${resultCount === 1 ? "" : "s"} and can't be deleted.`
-//       );
-//     }
- 
-//     await this.prisma.student.delete({ where: { id } });
-//     this.logger.warn(`Admin ${adminId} deleted student ${student.registrationNumber}`);
-//     return { message: "Student deleted." };
-//   }
- 
-//   private async ensureExists(id: number) {
-//     const student = await this.prisma.student.findUnique({
-//       where: { id },
-//       select: { id: true, registrationNumber: true },
-//     });
-//     if (!student) throw new NotFoundException("Student not found.");
-//     return student;
-//   }
-// }
- 
+}
