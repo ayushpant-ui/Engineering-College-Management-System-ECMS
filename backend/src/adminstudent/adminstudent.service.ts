@@ -226,31 +226,31 @@ export class AdminStudentsService {
 
     return student;
   }
-
- async remove(id: number, adminId: number) {
-  const student = await this.ensureExists(id);
-
-  // Check whether the student has any result records.
-  const resultCount = await this.prisma.result.count({
-    where: { studentId: id },
-  });
-
-  if (resultCount > 0) {
-    throw new BadRequestException(
-      `This student has ${resultCount} result record${
-        resultCount === 1 ? "" : "s"
-      } and can't be deleted.`,
-    );
-  }
-
-  await this.prisma.student.delete({
-    where: { id },
-  });
-
-  this.logger.warn(
-    `Admin ${adminId} deleted student ${student.registrationNumber}`,
-  );
-
-  return { message: "Student deleted." };
 }
-}
+//  async remove(id: number, adminId: number) {
+//   const student = await this.ensureExists(id);
+
+//   // Check whether the student has any result records.
+//   const resultCount = await this.prisma.result.count({
+//     where: { studentId: id },
+//   });
+
+//   if (resultCount > 0) {
+//     throw new BadRequestException(
+//       `This student has ${resultCount} result record${
+//         resultCount === 1 ? "" : "s"
+//       } and can't be deleted.`,
+//     );
+//   }
+
+//   await this.prisma.student.delete({
+//     where: { id },
+//   });
+
+//   this.logger.warn(
+//     `Admin ${adminId} deleted student ${student.registrationNumber}`,
+//   );
+
+//   return { message: "Student deleted." };
+// }
+// }
