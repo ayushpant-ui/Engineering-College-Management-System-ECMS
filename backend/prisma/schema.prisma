@@ -16,12 +16,31 @@ model Contact {
 }
 
 model Student {
-  id                 Int             @id @default(autoincrement())
-  registrationNumber String          @unique
+  id                 Int      @id @default(autoincrement())
+  registrationNumber String   @unique
   fullName           String
-  department         String
+  departmentId       Int
+  admissionYearId    Int
   semester           Int
-  account            StudentAccount?
+
+  department Department @relation(
+    fields: [departmentId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  admissionYear AcademicYear @relation(
+    fields: [admissionYearId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  account        StudentAccount?
+  enrollments    ExamEnrollment[]
+  subjectRecords StudentSubjectRecord[]
+
+  @@index([departmentId, admissionYearId])
+  @@map("students")
 }
 
 model StudentAccount {
@@ -93,20 +112,261 @@ enum ResultAction {
 }
 
 model Department {
-  id INT @id @default(autoincrement())
-  code INT 
-  name String 
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String   @unique
   createdAt DateTime @default(now())
+
+  students  Student[]
+  curricula Curriculum[]
 
   @@map("departments")
 }
 
 model AcademicYear {
-  id INT @id @default(autoincrement())
-  name String 
-  StartDate DateTime
-  EndDate DateTime
-  createdAt DateTime @default(autoincrement())
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // e.g. "2024/2025"
+  startDate DateTime?
+  endDate   DateTime?
+  createdAt DateTime @default(now())
 
-  @@map("academic_years)
+  students Student[]
+
+  @@map("academic_years")
+}
+
+model Curriculum {
+  id           Int      @id @default(autoincrement())
+  name         String
+  version      String
+  departmentId Int
+  createdAt    DateTime @default(now())
+
+  department Department @relation(
+    fields: [departmentId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  subjects CurriculumSubject[]
+
+  @@unique([departmentId, name, version])
+  @@map("curricula")
+}
+
+// 6. SUBJECT
+
+model Subject {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  creditHours Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  curricula     CurriculumSubject[]
+  results       Result[]
+  studentRecords StudentSubjectRecord[]
+
+  @@map("subjects")
+}
+
+// 7. SUBJECTS INCLUDED IN A CURRICULUM
+
+model CurriculumSubject {
+  id           Int  @id @default(autoincrement())
+  curriculumId Int
+  subjectId    Int
+  semester     Int
+  fullMarks    Int  @default(100)
+  passMarks    Int?
+
+  curriculum Curriculum @relation(
+    fields: [curriculumId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  subject Subject @relation(
+    fields: [subjectId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  @@unique([curriculumId, semester, subjectId])
+  @@index([curriculumId, semester])
+  @@map("curriculum_subjects")
+}
+
+// 8. EXAMINATION PERIOD
+
+model ExamPeriod {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique // e.g. "November 2026"
+  startsAt DateTime?
+  endsAt   DateTime?
+  createdAt DateTime @default(now())
+
+  exams Exam[]
+
+  @@map("exam_periods")
+}
+
+// 9. EXAMINATION
+model Exam {
+  id           Int      @id @default(autoincrement())
+  name         String
+  semester     Int
+  examType     ExamType
+  examPeriodId Int
+  createdAt    DateTime @default(now())
+
+  examPeriod ExamPeriod @relation(
+    fields: [examPeriodId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  enrollments ExamEnrollment[]
+  publication ResultPublication?
+
+  @@index([examPeriodId, semester, examType])
+  @@map("exams")
+}
+
+// STUDENT EXAMINATION ENROLLMENT
+
+model ExamEnrollment {
+  id        Int      @id @default(autoincrement())
+  studentId Int
+  examId    Int
+  createdAt DateTime @default(now())
+
+  student Student @relation(
+    fields: [studentId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  exam Exam @relation(
+    fields: [examId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  results Result[]
+
+  @@unique([studentId, examId])
+  @@index([examId])
+  @@map("exam_enrollments")
+}
+
+// RESULTS
+// One row per enrolled student and subject attempt
+
+
+model Result {
+  id            Int      @id @default(autoincrement())
+  enrollmentId  Int
+  subjectId     Int
+  marksObtained Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  enrollment ExamEnrollment @relation(
+    fields: [enrollmentId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  subject Subject @relation(
+    fields: [subjectId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  auditLogs    ResultAudit[]
+  recognizedFor StudentSubjectRecord? @relation("RecognizedResult")
+
+  @@unique([enrollmentId, subjectId])
+  @@index([subjectId])
+  @@map("results")
+}
+
+
+
+// EXAMINATION RESULT PUBLICATION
+// One publication record per examination
+
+
+model ResultPublication {
+  id          Int          @id @default(autoincrement())
+  examId      Int          @unique
+  status      ResultStatus @default(DRAFT)
+  publishedAt DateTime?
+  publishedBy Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  exam Exam @relation(
+    fields: [examId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  @@map("result_publications")
+}
+
+// 13. RECOGNIZED RESULT FOR GPA CALCULATIONS
+// Points to the result currently recognized for a subject
+
+
+model StudentSubjectRecord {
+  id                 Int      @id @default(autoincrement())
+  studentId          Int
+  subjectId          Int
+  recognizedResultId Int      @unique
+  updatedAt          DateTime @updatedAt
+
+  student Student @relation(
+    fields: [studentId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  subject Subject @relation(
+    fields: [subjectId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  recognizedResult Result @relation(
+    "RecognizedResult",
+    fields: [recognizedResultId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  @@unique([studentId, subjectId])
+  @@map("student_subject_records")
+}
+
+model ResultAudit {
+  id        Int          @id @default(autoincrement())
+  resultId  Int
+  action    ResultAction
+  oldMarks  Float?
+  newMarks  Float?
+  reason    String?
+  adminId   Int?
+  createdAt DateTime     @default(now())
+
+  result Result @relation(
+    fields: [resultId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  @@index([resultId, createdAt])
+  @@map("result_audit")
 }
