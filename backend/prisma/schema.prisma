@@ -72,3 +72,41 @@ model Notice {
   @@index([isPublished, isPinned, publishedAt])
   @@map("notices")
 }
+
+
+enum ExamType {
+REGULAR 
+BACKLOG
+}
+
+enum ResultStatus {
+ PUBLISHED
+ DRAFT
+}
+
+enum ResultAction {
+  CREATE 
+  UPDATE
+  PUBLISH
+  UNPUBLISH
+  RECOGNIZE
+}
+
+model Department {
+  id INT @id @default(autoincrement())
+  code INT 
+  name String 
+  createdAt DateTime @default(now())
+
+  @@map("departments")
+}
+
+model AcademicYear {
+  id INT @id @default(autoincrement())
+  name String 
+  StartDate DateTime
+  EndDate DateTime
+  createdAt DateTime @default(autoincrement())
+
+  @@map("academic_years)
+}
