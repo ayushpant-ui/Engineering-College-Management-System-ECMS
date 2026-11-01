@@ -3,9 +3,21 @@ export interface AdminStudent {
   fullName: string;
   registrationNumber: string;
   semester: number;
-  // The backend returns department as plain text or as an object, depending on your schema
-  department: string | { name: string } | null;
-  mustChangePassword?: boolean;
+  department: {
+    id: number;
+    name: string;
+  };
+
+  admissionYear: {
+    id: number;
+    name: string;
+  };
+
+  account: {
+    mustChangePassword: boolean;
+  } | null;
+  // department: string | { name: string } | null;
+  // mustChangePassword?: boolean;
 }
 
 export interface StudentList {

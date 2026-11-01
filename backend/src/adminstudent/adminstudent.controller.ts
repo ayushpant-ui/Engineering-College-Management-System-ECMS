@@ -10,30 +10,30 @@ import {
   Query,
   Req,
   UseGuards,
-} from "@nestjs/common";
-import { AdminGuard } from "../adminauth/admin.guard";
-import { AdminStudentsService } from "./adminstudent.service";
-import { CreateStudentDto, UpdateStudentDto } from "./dto/student.dto";
+} from '@nestjs/common';
+import { AdminGuard } from '../adminauth/admin.guard';
+import { AdminStudentsService } from './adminstudent.service';
+import { CreateStudentDto, UpdateStudentDto } from './dto/student.dto';
 
 type AdminRequest = { admin: { id: number } };
 
 const toInt = (value: string | undefined, fallback?: number) => {
-  const n = parseInt(value ?? "", 10);
+  const n = parseInt(value ?? '', 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
 };
 
 // Every route requires a valid ADMIN token.
-@Controller("admin/students")
+@Controller('admin/students')
 @UseGuards(AdminGuard)
 export class AdminStudentController {
   constructor(private readonly studentsService: AdminStudentsService) {}
 
   @Get()
   list(
-    @Query("page") page?: string,
-    @Query("limit") limit?: string,
-    @Query("search") search?: string,
-    @Query("semester") semester?: string
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('search') search?: string,
+    @Query('semester') semester?: string,
   ) {
     return this.studentsService.list({
       page: toInt(page, 1)!,
@@ -53,13 +53,17 @@ export class AdminStudentController {
     return this.studentsService.update(id, dto);
   }
 
-  @Post(":id/reset-password")
-  resetPassword(@Param("id", ParseIntPipe) id: number, @Req() req: AdminRequest) {
+
+  @Post(':id/reset-password')
+  resetPassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AdminRequest,
+  ) {
     return this.studentsService.resetPassword(id, req.admin.id);
   }
 
-//   @Delete(":id")
-//   remove(@Param("id", ParseIntPipe) id: number, @Req() req: AdminRequest) {
-//     return this.studentsService.remove(id, req.admin.id);
-//   }
+  //   @Delete(":id")
+  //   remove(@Param("id", ParseIntPipe) id: number, @Req() req: AdminRequest) {
+  //     return this.studentsService.remove(id, req.admin.id);
+  //   }
 }
