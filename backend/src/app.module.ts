@@ -10,7 +10,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AdminAuthModule } from './adminauth/adminauth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NoticesModule } from './notices/notices.module';
-import { AdminstudentModule } from './adminstudent/adminstudent.module';
+// import { AdminstudentModule } from './adminstudent/adminstudent.module';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { AdminstudentModule } from './adminstudent/adminstudent.module';
     PrismaModule,
     AdminAuthModule,
     NoticesModule,
-    AdminstudentModule,
+    // AdminstudentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

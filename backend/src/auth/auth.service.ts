@@ -23,6 +23,8 @@ export class AuthService {
       },
       include: {
         account: true,
+           department: true,
+    admissionYear: true,
       },
     });
 
@@ -52,18 +54,21 @@ export class AuthService {
 
     // returning the token and student info
 
-    return {
-      message: 'Login successfull',
-      accessToken,
-      student: {
-        id: student.id,
-        registrationNumber: student.registrationNumber,
-        fullName: student.fullName,
-        department: student.department,
-        semester: student.semester,
-        mustChangePassword: student.account.mustChangePassword,
-      },
-    };
+return {
+  message: "Login successful",
+  accessToken,
+  student: {
+    id: student.id,
+    registrationNumber: student.registrationNumber,
+    fullName: student.fullName,
+    departmentId: student.departmentId,
+    department: student.department.name,
+    admissionYearId: student.admissionYearId,
+    admissionYear: student.admissionYear.name,
+    semester: student.semester,
+    mustChangePassword: student.account.mustChangePassword,
+  },
+};
   }
   
   async changeStudentPassword(studentId: number, dto: ChangePasswordDto) {

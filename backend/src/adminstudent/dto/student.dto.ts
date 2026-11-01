@@ -13,8 +13,14 @@ export class CreateStudentDto {
   @IsInt() @Min(1) @Max(12) 
   semester!: number;
 
-  @IsString() @MinLength(1) @MaxLength(100) 
-  department!: string;
+  // @IsString() @MinLength(1) @MaxLength(100) 
+  // department!: string;
+
+  @IsInt() @Min(1)
+  admissionyearId! : number 
+
+  @IsInt() @Min(1)
+  departmentId ! : number 
 }
 
 
@@ -25,6 +31,12 @@ export class UpdateStudentDto {
   @IsOptional() @IsInt() @Min(1) @Max(12) 
   semester?: number;
   
-  @IsOptional() @IsString() @MinLength(1) @MaxLength(100) 
-  department?: string;
+  // @IsOptional() @IsString() @MinLength(1) @MaxLength(100) 
+  // department?: string;
+
+  @IsOptional() @IsInt() @Min(1)
+  admissionyearId! :number 
+
+  @IsOptional() @IsInt() @Min(1)
+  departmentId! : number 
 }

@@ -3,7 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException
+  BadRequestException,
 } from "@nestjs/common";
 
 import type { Prisma } from "@prisma/client";
@@ -18,7 +18,24 @@ const studentSelect = {
   fullName: true,
   registrationNumber: true,
   semester: true,
-  department: true,
+
+  // Fetch the related Department record.
+  department: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+
+  // Fetch the related AcademicYear record.
+  admissionYear: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+
+  // Fetch account information without exposing the password hash.
   account: {
     select: {
       mustChangePassword: true,
@@ -54,10 +71,6 @@ export class AdminStudentsService {
   private readonly logger = new Logger(AdminStudentsService.name);
 
   constructor(private readonly prisma: PrismaService) {}
-
-  private departmentData(name: string) {
-    return { department: name };
-  }
 
   async list({ page, limit, search, semester }: ListParams) {
     const where: Prisma.StudentWhereInput = {
@@ -114,9 +127,12 @@ export class AdminStudentsService {
           fullName: dto.fullName.trim(),
           registrationNumber: dto.registrationNumber.trim(),
           semester: dto.semester,
-          ...this.departmentData(dto.department.trim()),
 
-          // Create the related account at the same time.
+          // Foreign keys referencing existing records.
+          departmentId: dto.departmentId,
+          admissionYearId: dto.admissionyearId,
+
+          // Create the student account together with the student.
           account: {
             create: {
               passwordHash,
@@ -140,12 +156,19 @@ export class AdminStudentsService {
       if (
         typeof error === "object" &&
         error !== null &&
-        "code" in error &&
-        error.code === "P2002"
+        "code" in error
       ) {
-        throw new ConflictException(
-          "A student with this registration number already exists.",
-        );
+        if (error.code === "P2002") {
+          throw new ConflictException(
+            "A student with this registration number already exists.",
+          );
+        }
+
+        if (error.code === "P2003") {
+          throw new BadRequestException(
+            "The selected department or admission year does not exist.",
+          );
+        }
       }
 
       throw error;
@@ -155,24 +178,44 @@ export class AdminStudentsService {
   async update(id: number, dto: UpdateStudentDto) {
     await this.ensureExists(id);
 
-    return this.prisma.student.update({
-      where: { id },
+    try {
+      return await this.prisma.student.update({
+        where: { id },
 
-      data: {
-        ...(dto.fullName !== undefined && {
-          fullName: dto.fullName.trim(),
-        }),
+        data: {
+          ...(dto.fullName !== undefined && {
+            fullName: dto.fullName.trim(),
+          }),
 
-        ...(dto.semester !== undefined && {
-          semester: dto.semester,
-        }),
+          ...(dto.semester !== undefined && {
+            semester: dto.semester,
+          }),
 
-        ...(dto.department !== undefined &&
-          this.departmentData(dto.department.trim())),
-      },
+          ...(dto.departmentId !== undefined && {
+            departmentId: dto.departmentId,
+          }),
 
-      select: studentSelect,
-    });
+          ...(dto.admissionyearId !== undefined && {
+            admissionYearId: dto.admissionyearId,
+          }),
+        },
+
+        select: studentSelect,
+      });
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "P2003"
+      ) {
+        throw new BadRequestException(
+          "The selected department or admission year does not exist.",
+        );
+      }
+
+      throw error;
+    }
   }
 
   async resetPassword(id: number, adminId: number) {
@@ -206,7 +249,7 @@ export class AdminStudentsService {
       `Admin ${adminId} reset the password of student ${student.registrationNumber}`,
     );
 
-    // Return the plain password only to the authorized admin.
+    // Return the plain temporary password to the authorized admin.
     return { temporaryPassword };
   }
 
@@ -226,6 +269,12 @@ export class AdminStudentsService {
 
     return student;
   }
+
+  /*
+   * You can add your remove() method here later.
+   * Before deleting a student, check whether related result
+   * records or other academic records prevent deletion.
+   */
 }
 //  async remove(id: number, adminId: number) {
 //   const student = await this.ensureExists(id);
