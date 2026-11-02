@@ -3,19 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, KeyRound, LayoutDashboard, LogIn, LogOut } from "lucide-react";
+import { ChevronDown, KeyRound, LayoutDashboard, LogIn, LogOut, User } from "lucide-react";
 
 import { useStudentSession } from "@/hooks/useStudentSession";
 import { clearSession } from "@/lib/auth-session";
-
-function getInitials(fullName: string) {
-  return fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join("");
-}
+import StudentAvatar from "@/components/modules/student/StudentAvatar";
 
 export default function UserMenu() {
   const { student, isLoggedIn, ready } = useStudentSession();
@@ -75,9 +67,7 @@ export default function UserMenu() {
         aria-expanded={open}
         className="flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-2 transition-colors hover:border-blue-500 sm:pr-3 dark:border-slate-700"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
-          {getInitials(student.fullName)}
-        </span>
+        <StudentAvatar name={student.fullName} photoUrl={student.photoUrl} />
         <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-800 sm:block dark:text-slate-100">
           {student.fullName}
         </span>
@@ -104,6 +94,10 @@ export default function UserMenu() {
           </div>
 
           <div className="py-1">
+            <Link href="/student/profile" role="menuitem" className={menuItem}>
+              <User className="h-4 w-4" />
+              My Profile
+            </Link>
             <Link href="/student/dashboard" role="menuitem" className={menuItem}>
               <LayoutDashboard className="h-4 w-4" />
               Dashboard

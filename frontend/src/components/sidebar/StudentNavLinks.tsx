@@ -8,6 +8,7 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
+  User,
 } from "lucide-react";
 
 import {
@@ -23,6 +24,7 @@ import { clearSession } from "@/lib/auth-session";
 
 const studentLinks = [
   { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
+  { label: "My Profile", href: "/student/profile", icon: User },
   { label: "Results", href: "/student/results", icon: FileText },
   { label: "Attendance", href: "/student/attendance", icon: CalendarCheck },
   { label: "Class Routine", href: "/student/routine", icon: ClipboardList },

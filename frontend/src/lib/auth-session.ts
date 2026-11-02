@@ -1,4 +1,4 @@
-
+// Small helpers around the login data your LoginForm stores.
 export const AUTH_EVENT = "auth-change";
 
 export interface StudentSession {
@@ -8,6 +8,7 @@ export interface StudentSession {
   registrationNumber: string;
   semester: number;
   mustChangePassword?: boolean;
+  photoUrl?: string | null;
 }
 
 function isTokenExpired(token: string) {
@@ -51,4 +52,16 @@ export function getStoredSession(): StudentSession | null {
   } catch {
     return null;
   }
+}
+
+// Merge new fields (e.g. a new photo) into the saved student and tell the navbar/sidebar to refresh.
+export function updateStoredSession(patch: Partial<StudentSession>) {
+  const storage = localStorage.getItem("accessToken") ? localStorage : sessionStorage;
+  try {
+    const current = JSON.parse(storage.getItem("user") ?? "{}");
+    storage.setItem("user", JSON.stringify({ ...current, ...patch }));
+  } catch {
+    /* ignore a corrupted saved user */
+  }
+  notifyAuthChange();
 }
