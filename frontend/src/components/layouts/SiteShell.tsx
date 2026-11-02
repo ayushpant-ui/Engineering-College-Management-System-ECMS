@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/sidebar/AppSidebar";
 import Navbar from "@/components/modules/navbar/Navbar";
 import Footer from "@/components/modules/footer/Footer";
+import AiChatWidget from "@/components/modules/ai-chat/AiChatWidget";
 
 // The public website chrome (exactly what your old root layout wrapped around pages).
 export default function SiteShell({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 p-6">{children}</main>
         <Footer />
       </SidebarInset>
+      <AiChatWidget />
     </SidebarProvider>
   );
 }
