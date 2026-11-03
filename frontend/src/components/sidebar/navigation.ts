@@ -10,7 +10,9 @@ import {
   Image,
   Phone,
   LogIn,
+  BookOpen
 } from "lucide-react";
+
 
 export const navigation = [
   {
@@ -53,6 +55,11 @@ export const navigation = [
     url: "/contact",
     icon: Phone,
   },
+  {
+    title: "Syllabus",
+    url : "/syllabus",
+    icon : BookOpen
+  }
 ];
 
 export const secondaryNavigation = [

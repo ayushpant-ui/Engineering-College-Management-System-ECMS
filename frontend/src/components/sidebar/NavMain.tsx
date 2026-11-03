@@ -18,31 +18,24 @@ export default function NavMain() {
 
   return (
     <SidebarGroup>
-
       <SidebarGroupContent>
-
         <SidebarMenu>
-
           {navigation.map((item) => (
-
             <SidebarMenuItem key={item.title}>
-
-              <SidebarMenuButton
-  isActive={pathname === item.url}
->
-  <Link
-    href={item.url}
-    className="flex w-full cursor-pointer items-center gap-2 hover:translate-x-1
+              <SidebarMenuButton isActive={pathname === item.url}>
+                <Link
+                  href={item.url}
+                  className="flex w-full cursor-pointer items-center gap-2 hover:translate-x-1
 hover:bg-sidebar-accent
 transition-all
 duration-200"
-  >
-    <item.icon />
-    <span>{item.title}</span>
-  </Link>
-</SidebarMenuButton>
+                >
+                  <item.icon />
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
 
-{/* <SidebarMenuButton
+              {/* <SidebarMenuButton
   className="cursor-pointer"
   render={<Link href={item.url} />}
   isActive={pathname === item.url}
@@ -50,15 +43,10 @@ duration-200"
   <item.icon />
   <span>{item.title}</span>
 </SidebarMenuButton> */}
-
             </SidebarMenuItem>
-
           ))}
-
         </SidebarMenu>
-
       </SidebarGroupContent>
-
     </SidebarGroup>
   );
 }
