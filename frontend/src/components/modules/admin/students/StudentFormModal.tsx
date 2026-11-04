@@ -91,7 +91,7 @@ export default function StudentFormModal({
       registrationNumber: student?.registrationNumber ?? "",
       semester: student?.semester ?? 1,
       departmentId: student?.department.id,
-      admissionYearId: student?.admissionYear.id,
+      admissionYearId: 0,
     },
   });
 
@@ -125,7 +125,7 @@ export default function StudentFormModal({
   async function onSubmit(values: StudentFormData) {
     setServerError("");
 
-    try {
+    try { 
       if (isEdit) {
         await adminFetch(`/admin/students/${student.id}`, {
           method: "PATCH",
@@ -287,16 +287,16 @@ export default function StudentFormModal({
           </label>
 
           <select
-            id="admissionYearId"
-            disabled={loadingOptions}
-            {...register("admissionYearId", { valueAsNumber: true })}
-            className={field}
-          >
-            <option value={0}>
-              {loadingOptions
-                ? "Loading admission years..."
-                : "Select admission year"}
-            </option>
+  id="admissionYearId"
+  disabled={loadingOptions}
+  {...register("admissionYearId", { valueAsNumber: true })}
+  className={field}
+>
+  <option value="" disabled>
+    {loadingOptions
+      ? "Loading admission years..."
+      : "Select admission year"}
+  </option>
 
             {academicYears.map((year) => (
               <option key={year.id} value={year.id}>

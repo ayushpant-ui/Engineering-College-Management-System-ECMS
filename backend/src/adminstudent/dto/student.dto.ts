@@ -17,7 +17,7 @@ export class CreateStudentDto {
   // department!: string;
 
   @IsInt() @Min(1)
-  admissionyearId! : number 
+  admissionYearId! : number 
 
   @IsInt() @Min(1)
   departmentId ! : number 
@@ -35,7 +35,7 @@ export class UpdateStudentDto {
   // department?: string;
 
   @IsOptional() @IsInt() @Min(1)
-  admissionyearId! :number 
+  admissionYearId! :number 
 
   @IsOptional() @IsInt() @Min(1)
   departmentId! : number 

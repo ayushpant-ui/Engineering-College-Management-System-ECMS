@@ -130,7 +130,7 @@ export class AdminStudentsService {
 
           // Foreign keys referencing existing records.
           departmentId: dto.departmentId,
-          admissionYearId: dto.admissionyearId,
+          admissionYearId: dto.admissionYearId,
 
           // Create the student account together with the student.
           account: {
@@ -195,8 +195,8 @@ export class AdminStudentsService {
             departmentId: dto.departmentId,
           }),
 
-          ...(dto.admissionyearId !== undefined && {
-            admissionYearId: dto.admissionyearId,
+          ...(dto.admissionYearId !== undefined && {
+            admissionYearId: dto.admissionYearId,
           }),
         },
 
