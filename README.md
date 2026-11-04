@@ -20,12 +20,12 @@
 
 | Login | Student Dashboard |
 | :---: | :---: |
-| <img src="./frontend/public/images/Login.png" alt="ECMS login page" width="100%" /> | <img src="./frontend/public/images/ECMS-Demo.png" alt="ECMS student dashboard" width="100%" /> |
+| <img src="./frontend/public/images/Login.png" alt="ECMS login page" width="100%" /> | <img src="./frontend/public/images/Dashboard.png" alt="ECMS student dashboard" width="100%" /> |
 
-<p align="center"><b>Admin Panel</b></p>
-<p align="center">
-  <img src="./frontend/public/images/AdminPanel.png" alt="ECMS admin panel" width="100%" />
-</p>
+| AdminStudent | AdminNotice |
+| :---: | :---: |
+| <img src="./frontend/public/images/AdminStudent.png" alt="ECMS login page" width="100%" /> | <img src="./frontend/public/images/AdminNotice.png" alt="ECMS student dashboard" width="100%" /> |
+
 
 ---
 
