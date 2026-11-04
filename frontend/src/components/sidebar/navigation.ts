@@ -1,4 +1,3 @@
-// components/sidebar/navigation.ts
 
 import {
   Home,
