@@ -11,6 +11,7 @@ import { AdminAuthModule } from './adminauth/adminauth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NoticesModule } from './notices/notices.module';
 import { AdminstudentModule } from './adminstudent/adminstudent.module';
+import { StudentsModule } from './students/students.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AdminstudentModule } from './adminstudent/adminstudent.module';
     AdminAuthModule,
     NoticesModule,
     AdminstudentModule,
+    StudentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
