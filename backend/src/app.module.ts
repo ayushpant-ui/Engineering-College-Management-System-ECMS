@@ -12,6 +12,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { NoticesModule } from './notices/notices.module';
 import { AdminstudentModule } from './adminstudent/adminstudent.module';
 import { StudentsModule } from './students/students.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { StudentsModule } from './students/students.module';
     NoticesModule,
     AdminstudentModule,
     StudentsModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
