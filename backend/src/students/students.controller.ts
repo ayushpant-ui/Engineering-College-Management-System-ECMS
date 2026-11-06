@@ -1,4 +1,11 @@
-import { Controller, Patch, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Patch,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Post } from '@nestjs/common';
 import { JwtAuthGuard } from '@/auth/jwt-authguard';
 import { StudentsService } from './students.service';
@@ -6,21 +13,28 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { validateImageFile } from './dto/update-student-profile.dto';
 
-type Request = {
-    sub :string;
-}
-
 @UseGuards(JwtAuthGuard)
 @Controller('students')
 export class StudentsController {
-    constructor(private readonly studentsService: StudentsService) {}
+  constructor(private readonly studentsService: StudentsService) {}
 
-@Post('me/profile')
-async updateProfile(@Req() req:Request , updateStudentProfileDto: any) {
-    const id = req.sub; 
-    async function updateStudentProfile(id: string, updateStudentProfileDto: any) {
+  @Post('me/profile')
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: 2 * 1024 * 1024, // 2MB
+      },
+    }),
+  )
+  async updateProfileImage(
+    @Req() req: { user: { sub: string } },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    validateImageFile(file);
+    const id = req.user.sub;
+    
+      return await this.studentsService.updateProfileImage(Number(id), file);
+    }
+  }
 
-
-}
-}
-}
