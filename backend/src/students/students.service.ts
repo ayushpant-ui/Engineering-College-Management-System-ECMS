@@ -37,12 +37,14 @@ export class StudentsService {
                 profileImageUrl:true,
             },
         });
+
+        if (user.profileImageKey) {
+            // Deleting the previous image from Cloudinary
+            await this.cloudinary.deleteImage(user.profileImageKey);
+        }
         return {
             message: 'Profile image updated successfully',
             data : updatedUser
         }
-
-
-
     }
 }
