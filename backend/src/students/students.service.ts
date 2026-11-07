@@ -47,4 +47,20 @@ export class StudentsService {
             photoUrl: updatedUser.profileImageUrl,
         }
     }
+
+    async getProfileImage(StudentId : number ){
+        const user = await this.prisma.student.findUnique({
+            where: {
+                id:StudentId
+            },
+            select : {
+                profileImageUrl:true
+            }
+        })
+
+        return {
+            message: 'Profile image retrieved successfully',
+            photoUrl: user?.profileImageUrl || null,
+        }
+    }
 }

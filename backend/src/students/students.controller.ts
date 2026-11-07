@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Patch,
   Req,
   UploadedFile,
@@ -36,5 +37,16 @@ export class StudentsController {
     
       return await this.studentsService.updateProfileImage(Number(id), file);
     }
-  }
+
+
+    @Get('me/profile') 
+    async getProfileImage(@Req() req: {user: {sub: string}})
+    {
+      const id = req.user.sub; 
+      return await this.studentsService.getProfileImage(Number(id));
+    }
+}
+
+
+
 
