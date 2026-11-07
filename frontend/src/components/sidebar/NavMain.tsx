@@ -1,48 +1,57 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  Bell,
+  BookOpen,
+  Building2,
+  CalendarDays,
+  GraduationCap,
+  House,
+  Images,
+  Phone,
+  Users,
+} from "lucide-react";
 
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { navigation } from "./navigation";
+const items = [
+  { title: "Home", href: "/", icon: House },
+  { title: "About", href: "/about", icon: Building2 },
+  { title: "Departments", href: "/departments", icon: GraduationCap },
+  { title: "Faculty", href: "/faculty", icon: Users },
+  { title: "Notices", href: "/notices", icon: Bell },
+  { title: "Syllabus", href: "/syllabus", icon: BookOpen },
+  { title: "Events", href: "/events", icon: CalendarDays },
+  { title: "Gallery", href: "/gallery", icon: Images },
+  { title: "Contact", href: "/contact", icon: Phone },
+];
 
 export default function NavMain() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
-          {navigation.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton isActive={pathname === item.url}>
-                <Link
-                  href={item.url}
-                  className="flex w-full cursor-pointer items-center gap-2 hover:translate-x-1
-hover:bg-sidebar-accent
-transition-all
-duration-200"
-                >
-                  <item.icon />
-                  <span>{item.title}</span>
-                </Link>
+          {items.map(({ title, href, icon: Icon }) => (
+            <SidebarMenuItem key={href}>
+              <SidebarMenuButton
+                // The tooltip only appears while the sidebar is collapsed to icons
+                tooltip={title}
+                isActive={href === "/" ? pathname === "/" : pathname.startsWith(href)}
+                onClick={() => router.push(href)}
+              >
+                <Icon />
+                <span>{title}</span>
               </SidebarMenuButton>
-
-              {/* <SidebarMenuButton
-  className="cursor-pointer"
-  render={<Link href={item.url} />}
-  isActive={pathname === item.url}
->
-  <item.icon />
-  <span>{item.title}</span>
-</SidebarMenuButton> */}
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

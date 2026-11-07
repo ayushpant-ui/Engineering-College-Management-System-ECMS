@@ -27,7 +27,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Set `enabled: true` as you build each page.
 const sections = [
   {
     label: "Overview",
@@ -45,7 +44,7 @@ const sections = [
     items: [
       { label: "Departments", href: "/admin/departments", icon: Building2, enabled: false },
       { label: "Subjects", href: "/admin/subjects", icon: BookOpen, enabled: false },
-      { label: "Results", href: "/admin/results", icon: FileText, enabled: false },
+      { label: "Results", href: "/admin/results", icon: FileText, enabled: true },
     ],
   },
   {
@@ -64,13 +63,13 @@ export default function AdminSidebar() {
   const router = useRouter();
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
+        <div className="flex items-center gap-2.5 px-2 py-1.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8">
             <ShieldCheck className="h-5 w-5" />
           </span>
-          <div className="leading-tight">
+          <div className="leading-tight group-data-[collapsible=icon]:hidden">
             <p className="text-sm font-semibold">Admin Panel</p>
             <p className="text-xs text-muted-foreground">School of Engineering</p>
           </div>
@@ -94,7 +93,7 @@ export default function AdminSidebar() {
                       <Icon />
                       <span>{label}</span>
                       {!enabled && (
-                        <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground">
+                        <span className="ml-auto text-[10px] uppercase tracking-wide text-muted-foreground group-data-[collapsible=icon]:hidden">
                           Soon
                         </span>
                       )}

@@ -2,7 +2,7 @@
 
 import Logo from "./Logo";
 import NavMain from "./NavMain";
-import StudentNavLinks from "./StudentNavLinks";
+import StudentNavLinks from "@/components/sidebar/StudentNavLinks"; 
 
 import {
   Sidebar,
@@ -12,14 +12,16 @@ import {
 
 export default function AppSidebar() {
   return (
-    <Sidebar>
+    // collapsible="icon": collapsing shrinks the sidebar to an icon strip
+    // (the default, "offcanvas", hides it completely).
+    <Sidebar collapsible="icon">
       <SidebarHeader>
         <Logo />
       </SidebarHeader>
 
       <SidebarContent>
         <NavMain />
-        <StudentNavLinks /> {/* only renders when a student is logged in */}
+        <StudentNavLinks />
       </SidebarContent>
     </Sidebar>
   );
