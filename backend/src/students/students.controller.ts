@@ -20,7 +20,7 @@ export class StudentsController {
 
   @Post('me/profile')
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor('photo', {
       storage: memoryStorage(),
       limits: {
         fileSize: 2 * 1024 * 1024, // 2MB

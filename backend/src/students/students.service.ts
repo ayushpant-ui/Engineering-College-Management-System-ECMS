@@ -44,7 +44,7 @@ export class StudentsService {
         }
         return {
             message: 'Profile image updated successfully',
-            data : updatedUser
+            photoUrl: updatedUser.profileImageUrl,
         }
     }
 }

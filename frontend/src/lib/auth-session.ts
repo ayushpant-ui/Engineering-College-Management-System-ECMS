@@ -11,7 +11,7 @@ export interface StudentSession {
   photoUrl?: string | null;
 }
 
-function isTokenExpired(token: string) {
+export function isTokenExpired(token: string) {
   try {
     const payload = JSON.parse(
       atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
@@ -36,32 +36,71 @@ export function notifyAuthChange() {
   window.dispatchEvent(new Event(AUTH_EVENT));
 }
 
+// export function getStoredSession(): StudentSession | null {
+//   for (const storage of [localStorage, sessionStorage]) {
+//     const token = storage.getItem("accessToken");
+//     const raw = storage.getItem("user");
+
+//     if (!token || !raw) continue;
+
+//     if (isTokenExpired(token)) {
+//       storage.removeItem("accessToken");
+//       storage.removeItem("user");
+//       continue;
+//     }
+
+//     try {
+//       return JSON.parse(raw) as StudentSession;
+//     } catch {
+//       storage.removeItem("user");
+//     }
+//   }
+
+//   return null;
+// }
 export function getStoredSession(): StudentSession | null {
-  const storage = localStorage.getItem("accessToken") ? localStorage : sessionStorage;
-  const token = storage.getItem("accessToken");
-  const raw = storage.getItem("user");
-  if (!token || !raw) return null;
+  for (const storage of [localStorage, sessionStorage]) {
+    const token = storage.getItem("accessToken");
+    const raw = storage.getItem("user");
 
-  if (isTokenExpired(token)) {
-    clearSession();
-    return null;
+    if (!token || !raw) continue;
+
+    if (isTokenExpired(token)) {
+      storage.removeItem("accessToken");
+      storage.removeItem("user");
+      continue;
+    }
+
+    try {
+      return JSON.parse(raw) as StudentSession;
+    } catch {
+      storage.removeItem("user");
+    }
   }
 
-  try {
-    return JSON.parse(raw) as StudentSession;
-  } catch {
-    return null;
-  }
+  return null;
 }
-
 // Merge new fields (e.g. a new photo) into the saved student and tell the navbar/sidebar to refresh.
 export function updateStoredSession(patch: Partial<StudentSession>) {
-  const storage = localStorage.getItem("accessToken") ? localStorage : sessionStorage;
-  try {
-    const current = JSON.parse(storage.getItem("user") ?? "{}");
-    storage.setItem("user", JSON.stringify({ ...current, ...patch }));
-  } catch {
-    /* ignore a corrupted saved user */
+  for (const storage of [localStorage, sessionStorage]) {
+    const token = storage.getItem("accessToken");
+    const raw = storage.getItem("user");
+
+    if (!token || !raw) continue;
+
+    try {
+      const current = JSON.parse(raw);
+
+      storage.setItem(
+        "user",
+        JSON.stringify({ ...current, ...patch })
+      );
+
+      notifyAuthChange();
+      return;
+    } catch {
+      console.error("Could not update stored student session.");
+      return;
+    }
   }
-  notifyAuthChange();
 }

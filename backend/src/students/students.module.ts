@@ -1,12 +1,19 @@
 import { Module } from '@nestjs/common';
+
 import { StudentsController } from './students.controller';
 import { StudentsService } from './students.service';
-import { PrismaService } from '../../prisma/prisma.service';
+
+import { PrismaModule } from '../../prisma/prisma.module';
 import { CloudinaryModule } from '@/cloudinary/cloudinary.module';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
-  imports: [CloudinaryModule],
+  imports: [
+    PrismaModule,
+    CloudinaryModule,
+    AuthModule,
+  ],
   controllers: [StudentsController],
-  providers: [StudentsService, PrismaService]
+  providers: [StudentsService],
 })
 export class StudentsModule {}

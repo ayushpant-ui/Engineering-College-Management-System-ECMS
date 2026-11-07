@@ -16,7 +16,7 @@ import PhotoCropperModal from "./PhotoCropperModal";
 import StudentAvatar from "./StudentAvatar";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_FILE_BYTES = 8 * 1024 * 1024; // the picture is resized before upload, so this only guards decoding
+const MAX_FILE_BYTES = 2 * 1024 * 1024; // the picture is resized before upload, so this only guards decoding
 
 const card = "rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/60";
 
@@ -55,14 +55,14 @@ export default function StudentProfilePage() {
   useEffect(() => {
     const session = getStoredSession();
     if (!session) {
-      router.replace("/login"); // change if your login route is different
+      router.replace("/login"); 
       return;
     }
     setProfile((prev) => prev ?? { ...session });
 
     let cancelled = false;
     setLoadError("");
-    studentFetch<StudentProfile>("/student/profile")
+    studentFetch<StudentProfile>("/students/me/profile")
       .then((data) => !cancelled && setProfile((prev) => ({ ...(prev as StudentProfile), ...data })))
       .catch((err) => !cancelled && setLoadError(message(err)));
     return () => {
@@ -90,24 +90,33 @@ export default function StudentProfilePage() {
   async function uploadPhoto(blob: Blob) {
     const form = new FormData();
     form.append("photo", blob, "profile.jpg"); // field name the backend should expect: "photo"
+     try {
+    const result = await studentFetch<{ photoUrl: string }>(
+      "/students/me/profile",
+      {
+        method: "POST",
+        body: form,
+      },
+    );
 
-    const result = await studentFetch<{ photoUrl: string }>("/student/profile/photo", {
-      method: "POST",
-      body: form,
-    });
+    setProfile((prev) =>
+      prev ? { ...prev, photoUrl: result.photoUrl } : prev
+    );
 
-    setProfile((prev) => (prev ? { ...prev, photoUrl: result.photoUrl } : prev));
+    updateStoredSession({ photoUrl: result.photoUrl });
     setPhotoVersion(Date.now());
-    updateStoredSession({ photoUrl: result.photoUrl }); // updates the navbar avatar too
+
     setFile(null);
     showToast("Profile photo updated.");
+  } catch (err) {
+    setPhotoError(message(err));
   }
-
+}
   async function removePhoto() {
     setRemoving(true);
     setPhotoError("");
     try {
-      await studentFetch("/student/profile/photo", { method: "DELETE" });
+      await studentFetch("/students/me/profile", { method: "DELETE" });
       setProfile((prev) => (prev ? { ...prev, photoUrl: null } : prev));
       updateStoredSession({ photoUrl: null });
       setConfirmRemove(false);

@@ -1,4 +1,5 @@
 import { clearSession, getStoredSession } from "@/lib/auth-session";
+import { isTokenExpired } from "@/lib/auth-session";
 
 export class StudentApiError extends Error {
   status: number;
@@ -41,8 +42,29 @@ export function resolveMediaUrl(url?: string | null) {
 
 function getToken() {
   if (!getStoredSession()) return null;
-  return localStorage.getItem("accessToken") ?? sessionStorage.getItem("accessToken");
+
+  return localStorage.getItem("accessToken") ??
+    sessionStorage.getItem("accessToken");
 }
+
+
+// function getToken() {
+//   const session = getStoredSession();
+
+//   console.log("Stored session:", session);
+//   console.log("Session token:", !!sessionStorage.getItem("accessToken"));
+//   console.log("Session user:", !!sessionStorage.getItem("user"));
+
+//   if (!session) {
+//     console.error("getStoredSession() returned null");
+//     return null;
+//   }
+
+//   return (
+//     localStorage.getItem("accessToken") ??
+//     sessionStorage.getItem("accessToken")
+//   );
+// }
 
 function goToLogin() {
   clearSession();
