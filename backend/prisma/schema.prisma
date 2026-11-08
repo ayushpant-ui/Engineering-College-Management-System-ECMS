@@ -83,12 +83,12 @@ model Notice {
 // ENUMS
 // ======================================================
 
-enum ExamType {
+enum ExamType{
   REGULAR
   BACKLOG
 }
 
-enum ResultStatus {
+enum ResultStatus{
   DRAFT
   PUBLISHED
 }
@@ -182,14 +182,14 @@ model Curriculum {
 // ======================================================
 
 model Subject {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
-  name        String
-  creditHours Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   curricula      CurriculumSubject[]
+  components     SubjectComponent[]
   results        Result[]
   studentRecords StudentSubjectRecord[]
 
@@ -201,21 +201,20 @@ model Subject {
 // ======================================================
 
 model CurriculumSubject {
-  id           Int  @id @default(autoincrement())
+  id           Int @id @default(autoincrement())
   curriculumId Int
   subjectId    Int
   semester     Int
-  fullMarks    Int  @default(100)
-  passMarks    Int?
 
   curriculum Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Restrict)
   subject    Subject    @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  components CurriculumSubjectComponent[]
 
   @@unique([curriculumId, semester, subjectId])
   @@index([curriculumId, semester])
   @@map("curriculum_subjects")
 }
-
 // ======================================================
 // EXAMINATION PERIOD
 // ======================================================
@@ -276,15 +275,16 @@ model ExamEnrollment {
 // ======================================================
 
 model Result {
-  id            Int      @id @default(autoincrement())
-  enrollmentId  Int
-  subjectId     Int
-  marksObtained Float?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  enrollmentId Int
+  subjectId    Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  enrollment  ExamEnrollment       @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
-  subject     Subject               @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  enrollment ExamEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
+  subject    Subject        @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  components  ResultComponent[]
   auditLogs   ResultAudit[]
   recognizedFor StudentSubjectRecord? @relation("RecognizedResult")
 
@@ -292,7 +292,6 @@ model Result {
   @@index([subjectId])
   @@map("results")
 }
-
 // ======================================================
 // EXAMINATION RESULT PUBLICATION
 // ONE PUBLICATION RECORD PER EXAM
@@ -337,17 +336,91 @@ model StudentSubjectRecord {
 // ======================================================
 
 model ResultAudit {
-  id        Int          @id @default(autoincrement())
-  resultId  Int
+  id                Int      @id @default(autoincrement())
+  resultId          Int
+  resultComponentId Int?
+
   action    ResultAction
-  oldMarks  Float?
-  newMarks  Float?
+  oldMarks  Decimal? @db.Decimal(6, 2)
+  newMarks  Decimal? @db.Decimal(6, 2)
   reason    String?
   adminId   Int?
-  createdAt DateTime     @default(now())
+  createdAt DateTime @default(now())
 
-  result Result @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  result          Result           @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  resultComponent ResultComponent? @relation(fields: [resultComponentId], references: [id], onDelete: Restrict)
 
   @@index([resultId, createdAt])
   @@map("result_audit")
+}
+
+enum SubjectComponentType {
+  THEORY
+  PRACTICAL
+}
+
+model SubjectComponent {
+  id        Int                  @id @default(autoincrement())
+  subjectId Int
+  type      SubjectComponentType
+
+  subject   Subject                      @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  curricula CurriculumSubjectComponent[]
+
+  @@unique([subjectId, type])
+  @@map("subject_components")
+}
+
+
+model CurriculumSubjectComponent {
+  id                  Int @id @default(autoincrement())
+  curriculumSubjectId Int
+  componentId         Int
+
+  creditHours Int
+  fullMarks   Decimal  @db.Decimal(6, 2)
+  passMarks   Decimal? @db.Decimal(6, 2)
+
+  curriculumSubject CurriculumSubject @relation(fields: [curriculumSubjectId], references: [id], onDelete: Restrict)
+  component         SubjectComponent  @relation(fields: [componentId], references: [id], onDelete: Restrict)
+
+  results ResultComponent[]
+
+  @@unique([curriculumSubjectId, componentId])
+  @@map("curriculum_subject_components")
+}
+
+
+model GradeScale {
+  id             Int      @id @default(autoincrement())
+  grade          String   @unique
+  minPercentage  Decimal  @db.Decimal(5, 2)
+  maxPercentage  Decimal  @db.Decimal(5, 2)
+  gradeValue     Decimal  @db.Decimal(4, 2)
+
+  createdAt      DateTime @default(now())
+
+  @@map("grade_scales")
+}
+
+model ResultComponent {
+  id                          Int      @id @default(autoincrement())
+  resultId                    Int
+  curriculumSubjectComponentId Int
+
+  marksObtained Decimal? @db.Decimal(6, 2)
+  obtainedGrade String?
+  gradeValue    Decimal? @db.Decimal(4, 2)
+  gradePoint    Decimal? @db.Decimal(8, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  result                    Result                    @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  curriculumSubjectComponent CurriculumSubjectComponent @relation(fields: [curriculumSubjectComponentId], references: [id], onDelete: Restrict)
+
+  auditLogs ResultAudit[]
+
+  @@unique([resultId, curriculumSubjectComponentId])
+  @@map("result_components")
 }
