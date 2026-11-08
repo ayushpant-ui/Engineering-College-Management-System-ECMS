@@ -13,6 +13,12 @@ import { NoticesModule } from './notices/notices.module';
 import { AdminstudentModule } from './adminstudent/adminstudent.module';
 import { StudentsModule } from './students/students.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { DepartmentsModule } from './departments/departments.module';
+import { AcademicYearsModule } from './academic-years/academic-years.module';
+import { CurriculaModule } from './curricula/curricula.module';
+import { SubjectsModule } from './subjects/subjects.module';
+import { ExamsModule } from './exams/exams.module';
+import { ResultsModule } from './results/results.module';
 
 @Module({
   imports: [
@@ -34,6 +40,12 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     AdminstudentModule,
     StudentsModule,
     CloudinaryModule,
+    DepartmentsModule,
+    AcademicYearsModule,
+    CurriculaModule,
+    SubjectsModule,
+    ExamsModule,
+    ResultsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
