@@ -60,7 +60,7 @@ export class StudentsService {
 
         return {
             message: 'Profile image retrieved successfully',
-            photoUrl: user?.profileImageUrl || null,
+            photoUrl: user?.profileImageUrl ?? null,
         }
     }
 }
