@@ -3,11 +3,13 @@
 import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarCheck,
+  ClipboardCheck,
   ClipboardList,
   FileText,
   KeyRound,
   LayoutDashboard,
   LogOut,
+  Ticket,
   User,
 } from "lucide-react";
 
@@ -26,8 +28,10 @@ const studentLinks = [
   { label: "Dashboard", href: "/student/dashboard", icon: LayoutDashboard },
   { label: "My Profile", href: "/student/profile", icon: User },
   { label: "Results", href: "/student/results", icon: FileText },
-  { label: "Attendance", href: "/student/attendance", icon: CalendarCheck },
-  { label: "Class Routine", href: "/student/routine", icon: ClipboardList },
+  { label: "Exam Form", href: "/student/exam-form", icon: ClipboardCheck },
+  { label: "Admit Card", href: "/student/admit-card", icon: Ticket },
+  // { label: "Attendance", href: "/student/attendance", icon: CalendarCheck },
+  // { label: "Class Routine", href: "/student/routine", icon: ClipboardList },
   { label: "Change Password", href: "/student/change-password", icon: KeyRound },
 ];
 
