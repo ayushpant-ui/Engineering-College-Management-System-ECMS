@@ -6,6 +6,7 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  ClipboardList,
   FileText,
   GraduationCap,
   Images,
@@ -27,6 +28,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+
 const sections = [
   {
     label: "Overview",
@@ -45,6 +47,7 @@ const sections = [
       { label: "Departments", href: "/admin/departments", icon: Building2, enabled: false },
       { label: "Subjects", href: "/admin/subjects", icon: BookOpen, enabled: false },
       { label: "Results", href: "/admin/results", icon: FileText, enabled: true },
+      { label: "Exams", href: "/admin/exams", icon: ClipboardList, enabled: true },
     ],
   },
   {
