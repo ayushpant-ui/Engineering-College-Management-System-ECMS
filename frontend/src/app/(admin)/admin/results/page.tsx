@@ -1,10 +1,7 @@
-import AdminResultsPage from "@/components/modules/admin/results/AdminResultsPage";
+import ExamResultsListPage from "@/components/modules/admin/results/ExamResultsListPage";
 
-export const metadata = {
-  title: "Results | Admin",
-  robots: { index: false, follow: false },
-};
+export const metadata = { title: "Results | Admin", robots: { index: false, follow: false } };
 
 export default function AdminResultsRoute() {
-  return <AdminResultsPage />;
+  return <ExamResultsListPage />;
 }

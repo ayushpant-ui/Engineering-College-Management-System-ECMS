@@ -1,9 +1,7 @@
-import ResultsSection from "@/components/modules/results/ResultSection";
+import StudentResultsPage from "@/components/modules/student/results/StudentResultsPage";
 
-export const metadata = {
-  title: "My Results | School of Engineering",
-};
+export const metadata = { title: "My Results | School of Engineering" };
 
-export default function StudentResultsPage() {
-  return <ResultsSection />;
+export default function StudentResultsRoute() {
+  return <StudentResultsPage />;
 }
