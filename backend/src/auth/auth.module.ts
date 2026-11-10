@@ -26,7 +26,7 @@ import { PrismaModule } from '../../prisma/prisma.module';
         return {
           secret,
           signOptions: {
-            expiresIn: '15m',
+            expiresIn: '60m',
           },
         };
       },
