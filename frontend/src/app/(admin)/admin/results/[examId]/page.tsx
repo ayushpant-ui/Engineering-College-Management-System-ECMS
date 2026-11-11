@@ -1,8 +1,8 @@
-import ExamMarksPage from "@/components/modules/admin/results/ExamMarksPage";
+import ExamGradesPage from "@/components/modules/admin/results/ExamGradesPage";
 
 export const metadata = { title: "Exam Results | Admin", robots: { index: false, follow: false } };
 
 export default async function AdminExamResultsRoute({ params }: { params: Promise<{ examId: string }> }) {
   const { examId } = await params;
-  return <ExamMarksPage examId={Number(examId)} />;
+  return <ExamGradesPage examId={Number(examId)} />;
 }

@@ -10,7 +10,6 @@ import type { StudentResultsResponse } from "@/lib/result-types";
 
 const card = "flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/60";
 const iconBox = "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400";
-const typeLabel = { THEORY: "Theory", PRACTICAL: "Practical" } as const;
 
 export default function StudentResultsPage() {
   const router = useRouter();
@@ -52,6 +51,10 @@ export default function StudentResultsPage() {
   const exam = data?.exams.find((e) => e.examId === selected) ?? null;
   const credits = exam ? exam.subjects.reduce((sum, s) => sum + s.creditHours, 0) : 0;
   const backlogs = exam ? exam.subjects.filter((s) => !s.passed).length : 0;
+  const hasPractical = !!exam?.subjects.some((s) => s.components.some((c) => c.type === "PRACTICAL"));
+
+  const gradeOf = (subject: NonNullable<typeof exam>["subjects"][number], type: "THEORY" | "PRACTICAL") =>
+    subject.components.find((c) => c.type === type)?.grade ?? "—";
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -83,14 +86,11 @@ export default function StudentResultsPage() {
       )}
 
       {!loading && !error && data && data.exams.length === 0 && (
-        <div className="rounded-2xl border border-dashed py-16 text-center text-muted-foreground">
-          No results have been published yet.
-        </div>
+        <div className="rounded-2xl border border-dashed py-16 text-center text-muted-foreground">No results have been published yet.</div>
       )}
 
       {!loading && !error && data && exam && (
         <>
-          {/* Exam picker */}
           <div className="flex flex-wrap gap-2" role="tablist" aria-label="Examinations">
             {data.exams.map((e) => (
               <button
@@ -98,9 +98,7 @@ export default function StudentResultsPage() {
                 role="tab"
                 aria-selected={e.examId === selected}
                 onClick={() => setSelected(e.examId)}
-                className={`rounded-xl border px-4 py-2 text-left text-sm transition ${
-                  e.examId === selected ? "border-primary bg-primary/5" : "hover:border-primary"
-                }`}
+                className={`rounded-xl border px-4 py-2 text-left text-sm transition ${e.examId === selected ? "border-primary bg-primary/5" : "hover:border-primary"}`}
               >
                 <span className="block font-medium">{e.examName}</span>
                 <span className="block text-xs text-muted-foreground">
@@ -111,7 +109,6 @@ export default function StudentResultsPage() {
             ))}
           </div>
 
-          {/* Summary */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className={card}>
               <span className={iconBox}><GraduationCap className="h-5 w-5" /></span>
@@ -145,39 +142,31 @@ export default function StudentResultsPage() {
             </div>
           </div>
 
-          {/* Subjects */}
           <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60">
-            <table className="w-full min-w-[680px] text-left text-sm">
+            <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Code</th>
                   <th className="px-4 py-3 font-semibold">Subject</th>
-                  <th className="px-4 py-3 font-semibold">Marks and grade</th>
+                  <th className="px-4 py-3 text-center font-semibold">Theory</th>
+                  {hasPractical && <th className="px-4 py-3 text-center font-semibold">Practical</th>}
+                  <th className="px-4 py-3 text-center font-semibold">Final grade</th>
                   <th className="px-4 py-3 text-center font-semibold">Credit</th>
-                  <th className="px-4 py-3 text-center font-semibold">GPA</th>
                   <th className="px-4 py-3 text-center font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {exam.subjects.map((s) => (
-                  <tr key={s.subjectId} className="align-top text-slate-700 dark:text-slate-200">
+                  <tr key={s.subjectId} className="text-slate-700 dark:text-slate-200">
                     <td className="whitespace-nowrap px-4 py-3 font-medium">{s.code}</td>
                     <td className="px-4 py-3">
                       {s.name}
-                      {!s.recognized && (
-                        <span className="mt-1 block text-xs text-slate-400">Replaced by a later result in your CGPA</span>
-                      )}
+                      {!s.recognized && <span className="mt-1 block text-xs text-slate-400">Replaced by a later result in your CGPA</span>}
                     </td>
-                    <td className="px-4 py-3">
-                      {s.components.map((c) => (
-                        <p key={c.type} className="whitespace-nowrap">
-                          <span className="text-slate-500">{typeLabel[c.type]}:</span> {c.marksObtained}/{c.fullMarks}{" "}
-                          <span className={`font-semibold ${c.gradeValue > 0 ? "" : "text-red-500"}`}>{c.grade}</span>
-                        </p>
-                      ))}
-                    </td>
+                    <td className="px-4 py-3 text-center">{gradeOf(s, "THEORY")}</td>
+                    {hasPractical && <td className="px-4 py-3 text-center">{gradeOf(s, "PRACTICAL")}</td>}
+                    <td className={`px-4 py-3 text-center text-base font-bold ${s.passed ? "" : "text-red-500"}`}>{s.finalGrade}</td>
                     <td className="px-4 py-3 text-center">{s.creditHours}</td>
-                    <td className="px-4 py-3 text-center font-medium">{s.gradeValue.toFixed(2)}</td>
                     <td className="px-4 py-3 text-center">
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -196,8 +185,8 @@ export default function StudentResultsPage() {
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Grades and GPA are calculated by the college from the published marks. The official marksheet issued by the
-            examination section is the final record.
+            GPA is calculated by the college from the final grades. The official marksheet issued by the examination
+            section is the final record.
           </p>
         </>
       )}

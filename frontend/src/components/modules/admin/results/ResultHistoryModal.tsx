@@ -72,7 +72,7 @@ export default function ResultHistoryModal({
                 <th className="py-2 pr-3 font-semibold">When</th>
                 <th className="py-2 pr-3 font-semibold">Action</th>
                 <th className="py-2 pr-3 font-semibold">Student / subject</th>
-                <th className="py-2 pr-3 font-semibold">Marks</th>
+                <th className="py-2 pr-3 font-semibold">Grade</th>
                 <th className="py-2 font-semibold">Reason</th>
               </tr>
             </thead>
@@ -92,7 +92,7 @@ export default function ResultHistoryModal({
                       <>
                         <span className="font-medium">{e.student.registrationNumber}</span>
                         <span className="block text-xs text-muted-foreground">
-                          {e.subject?.code} {e.componentType && `· ${e.componentType.toLowerCase()}`}
+                          {e.subject?.code} {e.field && `· ${e.field === "FINAL" ? "final grade" : `${e.field.toLowerCase()} grade`}`}
                         </span>
                       </>
                     ) : (
@@ -100,7 +100,7 @@ export default function ResultHistoryModal({
                     )}
                   </td>
                   <td className="whitespace-nowrap py-2.5 pr-3">
-                    {e.student ? `${e.oldMarks ?? "—"} → ${e.newMarks ?? "—"}` : "—"}
+                    {e.student ? `${e.oldGrade ?? "—"} → ${e.newGrade ?? "—"}` : "—"}
                   </td>
                   <td className="py-2.5 text-muted-foreground">{e.reason ?? "—"}</td>
                 </tr>

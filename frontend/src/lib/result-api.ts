@@ -1,4 +1,4 @@
-import { computeCell, DEFAULT_GRADE_SCALE } from "@/lib/result-grading";
+import { componentKey, DEFAULT_GRADE_SCALE, finalKey, gradeValueOf } from "@/lib/result-grading";
 import type {
   AuditEntry,
   ComponentDef,
@@ -6,8 +6,9 @@ import type {
   ExamSummary,
   ExamType,
   GradeBand,
+  GradeField,
   PublicationStatus,
-  SaveMarksEntry,
+  SaveGradesEntry,
   StudentExamResult,
   StudentResultsResponse,
   StudentSubjectResult,
@@ -20,12 +21,12 @@ import type {
  *
  * It behaves like the backend should, so every screen works before the API exists.
  * When the backend is ready, keep these method names and signatures and replace each body
- * with a fetch() call (see RESULT-API.md for the endpoints). The screens don't need to change.
+ * with a fetch() call (see RESULT-API.md). The screens don't need to change.
  *
- * To reset the demo data: DevTools → Application → Local Storage → delete "ecms-result-mock-v1".
+ * To reset the demo data: DevTools → Application → Local Storage → delete "ecms-result-grades-mock-v1".
  */
 
-const KEY = "ecms-result-mock-v1";
+const KEY = "ecms-result-grades-mock-v1";
 
 export class ResultApiError extends Error {}
 
@@ -55,7 +56,7 @@ interface MockExam {
   semester: number;
   examType: ExamType;
   examPeriod: { id: number; name: string };
-  publication: "DRAFT" | "PUBLISHED" | null; // ResultPublication.status (null = no row yet)
+  publication: "DRAFT" | "PUBLISHED" | null; // ResultPublication.status
   publishedAt: string | null;
 }
 interface MockEnrollment {
@@ -72,37 +73,30 @@ interface Db {
   students: MockStudent[];
   exams: MockExam[];
   enrollments: MockEnrollment[];
-  marks: Record<string, number>; // `${enrollmentId}:${componentId}` → marks obtained
+  grades: Record<string, string>; // component: `${enrollmentId}:C${componentId}`, final: `${enrollmentId}:F${subjectId}`
   audit: AuditRecord[];
   seq: number;
 }
 
-const comp = (
-  id: number,
-  type: ComponentDef["type"],
-  creditHours: number,
-  fullMarks: number,
-  passMarks: number | null
-): ComponentDef => ({ id, type, creditHours, fullMarks, passMarks });
+const comp = (id: number, type: ComponentDef["type"], creditHours: number): ComponentDef => ({ id, type, creditHours });
 
-// Deterministic sample marks (about one in eleven fails)
-const sampleMarks = (enrollmentId: number, def: ComponentDef) => {
-  let pct = 0.42 + ((enrollmentId * 31 + def.id * 17) % 55) / 100;
-  if ((enrollmentId + def.id) % 11 === 0) pct = 0.3;
-  return Math.min(def.fullMarks, Math.round(def.fullMarks * pct * 2) / 2);
-};
+// Same final-grade key shape as the screens use, plus the subject (a Result belongs to enrollment + subject)
+const finalGradeKey = (enrollmentId: number, subjectId: number) => `${finalKey(enrollmentId)}${subjectId}`;
+
+const POOL = ["A+", "A", "A", "B+", "B+", "B", "B", "C+", "C"];
+const sampleGrade = (seed: number) => ((seed * 7 + 3) % 11 === 0 ? "F" : POOL[(seed * 5 + 2) % POOL.length]);
 
 function seed(): Db {
   const subjects: MockSubject[] = [
-    { id: 11, code: "CMP 201", name: "Data Structures & Algorithms", semester: 3, components: [comp(111, "THEORY", 3, 60, 24), comp(112, "PRACTICAL", 1, 40, 16)] },
-    { id: 12, code: "CMP 202", name: "Digital Logic", semester: 3, components: [comp(121, "THEORY", 3, 100, 40)] },
-    { id: 13, code: "CMP 203", name: "Database Management Systems", semester: 3, components: [comp(131, "THEORY", 3, 60, 24), comp(132, "PRACTICAL", 1, 40, 16)] },
-    { id: 14, code: "SH 201", name: "Engineering Mathematics III", semester: 3, components: [comp(141, "THEORY", 3, 100, 40)] },
-    { id: 21, code: "CMP 251", name: "Theory of Computation", semester: 4, components: [comp(211, "THEORY", 3, 100, 40)] },
-    { id: 22, code: "CMP 252", name: "Computer Networks", semester: 4, components: [comp(221, "THEORY", 3, 60, 24), comp(222, "PRACTICAL", 1, 40, 16)] },
-    { id: 23, code: "CMP 253", name: "Microprocessors", semester: 4, components: [comp(231, "THEORY", 3, 60, 24), comp(232, "PRACTICAL", 1, 40, 16)] },
-    { id: 24, code: "SH 251", name: "Numerical Methods", semester: 4, components: [comp(241, "THEORY", 3, 100, 40)] },
-    { id: 25, code: "CMP 254", name: "Software Engineering", semester: 4, components: [comp(251, "THEORY", 3, 60, 24), comp(252, "PRACTICAL", 1, 40, 16)] },
+    { id: 11, code: "CMP 201", name: "Data Structures & Algorithms", semester: 3, components: [comp(111, "THEORY", 3), comp(112, "PRACTICAL", 1)] },
+    { id: 12, code: "CMP 202", name: "Digital Logic", semester: 3, components: [comp(121, "THEORY", 3)] },
+    { id: 13, code: "CMP 203", name: "Database Management Systems", semester: 3, components: [comp(131, "THEORY", 3), comp(132, "PRACTICAL", 1)] },
+    { id: 14, code: "SH 201", name: "Engineering Mathematics III", semester: 3, components: [comp(141, "THEORY", 3)] },
+    { id: 21, code: "CMP 251", name: "Theory of Computation", semester: 4, components: [comp(211, "THEORY", 3)] },
+    { id: 22, code: "CMP 252", name: "Computer Networks", semester: 4, components: [comp(221, "THEORY", 3), comp(222, "PRACTICAL", 1)] },
+    { id: 23, code: "CMP 253", name: "Microprocessors", semester: 4, components: [comp(231, "THEORY", 3), comp(232, "PRACTICAL", 1)] },
+    { id: 24, code: "SH 251", name: "Numerical Methods", semester: 4, components: [comp(241, "THEORY", 3)] },
+    { id: 25, code: "CMP 254", name: "Software Engineering", semester: 4, components: [comp(251, "THEORY", 3), comp(252, "PRACTICAL", 1)] },
   ];
 
   const people: [string, string][] = [
@@ -123,33 +117,9 @@ function seed(): Db {
   }));
 
   const exams: MockExam[] = [
-    {
-      id: 1,
-      name: "Fourth Semester Regular Examination",
-      semester: 4,
-      examType: "REGULAR",
-      examPeriod: { id: 1, name: "2026 Final Examination" },
-      publication: null,
-      publishedAt: null,
-    },
-    {
-      id: 2,
-      name: "Third Semester Regular Examination",
-      semester: 3,
-      examType: "REGULAR",
-      examPeriod: { id: 2, name: "2025 Final Examination" },
-      publication: "PUBLISHED",
-      publishedAt: day(-60),
-    },
-    {
-      id: 3,
-      name: "Third Semester Backlog Examination",
-      semester: 3,
-      examType: "BACKLOG",
-      examPeriod: { id: 3, name: "2026 Backlog Examination" },
-      publication: null,
-      publishedAt: null,
-    },
+    { id: 1, name: "Fourth Semester Regular Examination", semester: 4, examType: "REGULAR", examPeriod: { id: 1, name: "2026 Final Examination" }, publication: null, publishedAt: null },
+    { id: 2, name: "Third Semester Regular Examination", semester: 3, examType: "REGULAR", examPeriod: { id: 2, name: "2025 Final Examination" }, publication: "PUBLISHED", publishedAt: day(-60) },
+    { id: 3, name: "Third Semester Backlog Examination", semester: 3, examType: "BACKLOG", examPeriod: { id: 3, name: "2026 Backlog Examination" }, publication: null, publishedAt: null },
   ];
 
   const enrollments: MockEnrollment[] = [];
@@ -160,12 +130,12 @@ function seed(): Db {
   enrollments.push({ id: ++enrollmentId, examId: 3, studentId: 3, subjectIds: [12] });
   enrollments.push({ id: ++enrollmentId, examId: 3, studentId: 6, subjectIds: [11, 13] });
 
-  const marks: Record<string, number> = {};
+  const grades: Record<string, string> = {};
   const fill = (exam: MockExam, subjectIds: number[], onlyFirst?: number) => {
-    const list = enrollments.filter((e) => e.examId === exam.id).slice(0, onlyFirst);
-    for (const e of list) {
+    for (const e of enrollments.filter((x) => x.examId === exam.id).slice(0, onlyFirst)) {
       for (const subject of subjects.filter((s) => subjectIds.includes(s.id))) {
-        for (const def of subject.components) marks[`${e.id}:${def.id}`] = sampleMarks(e.id, def);
+        for (const def of subject.components) grades[componentKey(e.id, def.id)] = sampleGrade(e.id * 3 + def.id);
+        grades[finalGradeKey(e.id, subject.id)] = sampleGrade(e.id * 3 + subject.id);
       }
     }
   };
@@ -173,7 +143,7 @@ function seed(): Db {
   fill(exams[0], [21, 22]); // fourth semester: two subjects complete
   fill(exams[0], [23], 4); // one subject half done
 
-  return { gradeScale: DEFAULT_GRADE_SCALE, subjects, students, exams, enrollments, marks, audit: [], seq: 0 };
+  return { gradeScale: DEFAULT_GRADE_SCALE, subjects, students, exams, enrollments, grades, audit: [], seq: 0 };
 }
 
 function save(db: Db) {
@@ -198,8 +168,6 @@ function load(): Db {
 
 // ── Lookups ──
 
-const markKey = (enrollmentId: number, componentId: number) => `${enrollmentId}:${componentId}`;
-
 function findExam(db: Db, id: number) {
   const exam = db.exams.find((e) => e.id === id);
   if (!exam) throw new ResultApiError("Exam not found.");
@@ -223,14 +191,13 @@ function rowsFor(db: Db, exam: MockExam, subject: MockSubject) {
 const subjectsFor = (db: Db, exam: MockExam) =>
   db.subjects.filter((s) => s.semester === exam.semester && rowsFor(db, exam, s).length > 0);
 
-const hasAllMarks = (db: Db, enrollmentId: number, subject: MockSubject) =>
-  subject.components.every((c) => db.marks[markKey(enrollmentId, c.id)] !== undefined);
+const hasFinal = (db: Db, enrollmentId: number, subjectId: number) =>
+  db.grades[finalGradeKey(enrollmentId, subjectId)] !== undefined;
 
 function statusOf(db: Db, exam: MockExam): PublicationStatus {
   if (exam.publication) return exam.publication;
   const ids = new Set(db.enrollments.filter((e) => e.examId === exam.id).map((e) => e.id));
-  const anyMarks = Object.keys(db.marks).some((k) => ids.has(Number(k.split(":")[0])));
-  return anyMarks ? "DRAFT" : "NOT_STARTED";
+  return Object.keys(db.grades).some((k) => ids.has(Number(k.split(":")[0]))) ? "DRAFT" : "NOT_STARTED";
 }
 
 function summarize(db: Db, exam: MockExam): ExamSummary {
@@ -243,9 +210,7 @@ function summarize(db: Db, exam: MockExam): ExamSummary {
     examPeriod: exam.examPeriod,
     enrolledCount: db.enrollments.filter((e) => e.examId === exam.id).length,
     subjectCount: subjects.length,
-    completedSubjects: subjects.filter((s) =>
-      rowsFor(db, exam, s).every((r) => hasAllMarks(db, r.enrollment.id, s))
-    ).length,
+    completedSubjects: subjects.filter((s) => rowsFor(db, exam, s).every((r) => hasFinal(db, r.enrollment.id, s.id))).length,
     status: statusOf(db, exam),
     publishedAt: exam.publishedAt,
   };
@@ -254,6 +219,9 @@ function summarize(db: Db, exam: MockExam): ExamSummary {
 function addAudit(db: Db, entry: Omit<AuditRecord, "id" | "createdAt" | "adminId">) {
   db.audit.unshift({ ...entry, id: ++db.seq, createdAt: new Date().toISOString(), adminId: 1 });
 }
+
+const validGrade = (db: Db, grade: string | null | undefined) =>
+  grade === null || grade === undefined || db.gradeScale.some((b) => b.grade === grade);
 
 // ── Admin API ──
 
@@ -282,7 +250,7 @@ export const resultApi = {
         name: s.name,
         components: s.components,
         totalCount: rows.length,
-        enteredCount: rows.filter((r) => hasAllMarks(db, r.enrollment.id, s)).length,
+        enteredCount: rows.filter((r) => hasFinal(db, r.enrollment.id, s.id)).length,
       };
     });
 
@@ -304,21 +272,19 @@ export const resultApi = {
         studentId: student.id,
         registrationNumber: student.registrationNumber,
         fullName: student.fullName,
-        cells: Object.fromEntries(
-          subject.components.map((def) => [
-            String(def.id),
-            computeCell(def, db.marks[markKey(enrollment.id, def.id)] ?? null, db.gradeScale),
-          ])
+        componentGrades: Object.fromEntries(
+          subject.components.map((def) => [String(def.id), db.grades[componentKey(enrollment.id, def.id)] ?? null])
         ),
+        finalGrade: db.grades[finalGradeKey(enrollment.id, subject.id)] ?? null,
       })),
     };
   },
 
   // The server validates everything again. Once published, any change needs a reason.
-  async saveMarks(
+  async saveGrades(
     examId: number,
     subjectId: number,
-    entries: SaveMarksEntry[],
+    entries: SaveGradesEntry[],
     reason?: string
   ): Promise<{ saved: number }> {
     await delay(350);
@@ -327,46 +293,52 @@ export const resultApi = {
     const subject = findSubject(db, subjectId);
     const published = statusOf(db, exam) === "PUBLISHED";
 
-    const rows = rowsFor(db, exam, subject);
-    const allowed = new Set(rows.map((r) => r.enrollment.id));
+    const allowed = new Set(rowsFor(db, exam, subject).map((r) => r.enrollment.id));
     const defs = new Map(subject.components.map((c) => [c.id, c]));
 
-    const changes: { entry: SaveMarksEntry; def: ComponentDef; previous: number | null }[] = [];
-    for (const entry of entries) {
-      const def = defs.get(entry.componentId);
-      if (!def || !allowed.has(entry.enrollmentId)) throw new ResultApiError("Unknown student or component.");
-      if (entry.marks !== null && (entry.marks < 0 || entry.marks > def.fullMarks)) {
-        throw new ResultApiError(`Marks must be between 0 and ${def.fullMarks}.`);
-      }
-      const previous = db.marks[markKey(entry.enrollmentId, entry.componentId)] ?? null;
-      if (previous === entry.marks) continue;
-      if (published && entry.marks === null) {
-        throw new ResultApiError("Published marks can't be cleared. Unpublish the exam first.");
-      }
-      changes.push({ entry, def, previous });
-    }
-    if (changes.length === 0) return { saved: 0 };
+    type Change = { key: string; enrollmentId: number; field: GradeField; previous: string | null; next: string | null };
+    const changes: Change[] = [];
 
+    const consider = (enrollmentId: number, key: string, field: GradeField, next: string | null) => {
+      if (!validGrade(db, next)) throw new ResultApiError(`"${next}" is not a valid grade.`);
+      const previous = db.grades[key] ?? null;
+      if (previous === next) return;
+      if (published && next === null) throw new ResultApiError("Published grades can't be cleared. Unpublish the exam first.");
+      changes.push({ key, enrollmentId, field, previous, next });
+    };
+
+    for (const entry of entries) {
+      if (!allowed.has(entry.enrollmentId)) throw new ResultApiError("Unknown student.");
+      for (const [componentId, grade] of Object.entries(entry.componentGrades ?? {})) {
+        const def = defs.get(Number(componentId));
+        if (!def) throw new ResultApiError("Unknown component.");
+        consider(entry.enrollmentId, componentKey(entry.enrollmentId, def.id), def.type, grade);
+      }
+      if (entry.finalGrade !== undefined) {
+        consider(entry.enrollmentId, finalGradeKey(entry.enrollmentId, subject.id), "FINAL", entry.finalGrade);
+      }
+    }
+
+    if (changes.length === 0) return { saved: 0 };
     if (published && (!reason || reason.trim().length < 3)) {
       throw new ResultApiError("A reason is required when changing published results.");
     }
 
-    for (const { entry, def, previous } of changes) {
-      const key = markKey(entry.enrollmentId, entry.componentId);
-      if (entry.marks === null) delete db.marks[key];
-      else db.marks[key] = entry.marks;
+    for (const c of changes) {
+      if (c.next === null) delete db.grades[c.key];
+      else db.grades[c.key] = c.next;
 
-      const enrollment = db.enrollments.find((e) => e.id === entry.enrollmentId)!;
+      const enrollment = db.enrollments.find((e) => e.id === c.enrollmentId)!;
       const student = db.students.find((s) => s.id === enrollment.studentId)!;
       addAudit(db, {
         examId,
         subjectId,
-        action: previous === null ? "CREATE" : "UPDATE",
+        action: c.previous === null ? "CREATE" : "UPDATE",
         subject: { code: subject.code, name: subject.name },
         student: { registrationNumber: student.registrationNumber, fullName: student.fullName },
-        componentType: def.type,
-        oldMarks: previous,
-        newMarks: entry.marks,
+        field: c.field,
+        oldGrade: c.previous,
+        newGrade: c.next,
         reason: published ? reason!.trim() : null,
       });
     }
@@ -383,24 +355,16 @@ export const resultApi = {
     const status = statusOf(db, exam);
 
     if (status === "PUBLISHED") throw new ResultApiError("This exam is already published.");
-    if (status === "NOT_STARTED") throw new ResultApiError("Enter some marks before publishing.");
+    const enrollmentIds = new Set(db.enrollments.filter((e) => e.examId === examId).map((e) => e.id));
+    const anyFinal = Object.keys(db.grades).some((k) => /^\d+:F\d+$/.test(k) && enrollmentIds.has(Number(k.split(":")[0])));
+    if (!anyFinal) throw new ResultApiError("Enter at least one final grade before publishing.");
 
     exam.publication = "PUBLISHED";
     exam.publishedAt = new Date().toISOString();
-    addAudit(db, {
-      examId,
-      subjectId: null,
-      action: "PUBLISH",
-      subject: null,
-      student: null,
-      componentType: null,
-      oldMarks: null,
-      newMarks: null,
-      reason: null,
-    });
+    addAudit(db, { examId, subjectId: null, action: "PUBLISH", subject: null, student: null, field: null, oldGrade: null, newGrade: null, reason: null });
     // The real backend also records which result counts for GPA (StudentSubjectRecord, action RECOGNIZE)
     save(db);
-    return { publishedStudents: db.enrollments.filter((e) => e.examId === examId).length };
+    return { publishedStudents: enrollmentIds.size };
   },
 
   async unpublish(examId: number, reason: string): Promise<void> {
@@ -413,17 +377,7 @@ export const resultApi = {
 
     exam.publication = "DRAFT";
     exam.publishedAt = null;
-    addAudit(db, {
-      examId,
-      subjectId: null,
-      action: "UNPUBLISH",
-      subject: null,
-      student: null,
-      componentType: null,
-      oldMarks: null,
-      newMarks: null,
-      reason: reason.trim(),
-    });
+    addAudit(db, { examId, subjectId: null, action: "UNPUBLISH", subject: null, student: null, field: null, oldGrade: null, newGrade: null, reason: reason.trim() });
     save(db);
   },
 
@@ -438,11 +392,7 @@ export const resultApi = {
   // ── Student API ──
 
   // Gives the logged-in student some demo enrollments so the screens have data
-  async getMyResults(me: {
-    registrationNumber: string;
-    fullName: string;
-    semester: number;
-  }): Promise<StudentResultsResponse> {
+  async getMyResults(me: { registrationNumber: string; fullName: string; semester: number }): Promise<StudentResultsResponse> {
     await delay();
     const db = load();
 
@@ -466,44 +416,35 @@ export const resultApi = {
       db.enrollments.push(enrollment);
       if (exam.id === 2) {
         for (const subject of db.subjects.filter((s) => s.semester === 3)) {
-          for (const def of subject.components) db.marks[markKey(enrollment.id, def.id)] = sampleMarks(enrollment.id, def);
+          for (const def of subject.components) db.grades[componentKey(enrollment.id, def.id)] = sampleGrade(enrollment.id * 3 + def.id);
+          db.grades[finalGradeKey(enrollment.id, subject.id)] = sampleGrade(enrollment.id * 3 + subject.id);
         }
       }
     }
     save(db);
 
-    const mine = db.exams
+    const published = db.exams
       .filter((e) => e.publication === "PUBLISHED")
       .sort((a, b) => (b.publishedAt ?? "").localeCompare(a.publishedAt ?? ""));
 
-    const recognizedSubjects = new Set<number>(); // newest published result of each subject counts for CGPA
+    const recognizedSubjects = new Set<number>(); // the newest published result of each subject counts for CGPA
     let cgpaPoints = 0;
     let cgpaCredits = 0;
     const exams: StudentExamResult[] = [];
 
-    for (const exam of mine) {
+    for (const exam of published) {
       const enrollment = db.enrollments.find((e) => e.examId === exam.id && e.studentId === student!.id);
       if (!enrollment) continue;
 
       const subjects: StudentSubjectResult[] = [];
       for (const subject of subjectsFor(db, exam)) {
         const sits = rowsFor(db, exam, subject).some((r) => r.enrollment.id === enrollment.id);
-        if (!sits || !hasAllMarks(db, enrollment.id, subject)) continue;
+        const final = db.grades[finalGradeKey(enrollment.id, subject.id)];
+        if (!sits || final === undefined) continue; // students only see subjects that have a final grade
 
-        const components = subject.components.map((def) => {
-          const cell = computeCell(def, db.marks[markKey(enrollment.id, def.id)], db.gradeScale);
-          return {
-            type: def.type,
-            creditHours: def.creditHours,
-            fullMarks: def.fullMarks,
-            passMarks: def.passMarks,
-            marksObtained: cell.marks as number,
-            grade: cell.grade as string,
-            gradeValue: cell.gradeValue as number,
-          };
-        });
-        const creditHours = components.reduce((s, c) => s + c.creditHours, 0);
-        const gradePoint = components.reduce((s, c) => s + c.gradeValue * c.creditHours, 0);
+        const gradeValue = gradeValueOf(db.gradeScale, final) ?? 0;
+        const creditHours = subject.components.reduce((s, c) => s + c.creditHours, 0);
+        const gradePoint = gradeValue * creditHours;
         const recognized = !recognizedSubjects.has(subject.id);
 
         if (recognized) {
@@ -516,11 +457,15 @@ export const resultApi = {
           subjectId: subject.id,
           code: subject.code,
           name: subject.name,
-          components,
+          components: subject.components.map((def) => ({
+            type: def.type,
+            grade: db.grades[componentKey(enrollment.id, def.id)] ?? null,
+          })),
+          finalGrade: final,
+          gradeValue,
           creditHours,
           gradePoint,
-          gradeValue: creditHours > 0 ? gradePoint / creditHours : 0,
-          passed: components.every((c) => c.gradeValue > 0),
+          passed: gradeValue > 0,
           recognized,
         });
       }
