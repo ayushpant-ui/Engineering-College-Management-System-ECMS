@@ -1,24 +1,27 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post,Param,Body,ParseIntPipe } from '@nestjs/common';
 import { CreateExamPeriodDto } from './dto/create-exam-period.dto';
 import { ResultsService } from './results.service';
+import { UseGuards } from '@nestjs/common';
+import { AdminGuard } from '@/adminauth/admin.guard';
 
-@Controller('results')
+@UseGuards(AdminGuard) 
+@Controller('admin/results')
 export class ResultsController {
     constructor(private readonly resultsService: ResultsService) {}
     
-    @Post('exam-period')
-    async createExamPeriod(data: CreateExamPeriodDto) {
-        return this.resultsService.createResultsByExamPeriod(data);
+    @Post('exam-periods')
+    async createExamPeriod(@Body() dto: CreateExamPeriodDto) {
+        return this.resultsService.createResultsByExamPeriod(dto);
     }
 
-    @Get('exam-period')
+    @Get('exam-periods')
     async getResultsByExamPeriod() {
         return this.resultsService.getResultsByExamPeriod();
     }
 
 
     @Get('exam-period/:id')
-    async getResultsByExamPeriodId(id: number) {
+    async getResultsByExamPeriodId(@Param('id', ParseIntPipe) id: number) {
         return this.resultsService.getResultsByExamPeriodId(id);
     }
 }

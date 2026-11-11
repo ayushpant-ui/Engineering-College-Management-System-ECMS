@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Search, X, CalendarDays } from "lucide-react";
+import { Plus, Search, X, CalendarDays, AlertCircle } from "lucide-react";
 
 import {
   ExamPeriod,
@@ -17,16 +17,10 @@ interface Props {
   onClose: () => void;
 }
 
-export default function ExamPeriodDialog({
-  open,
-  onClose,
-}: Props) {
+export default function ExamPeriodDialog({ open, onClose }: Props) {
   const [periods, setPeriods] = useState<ExamPeriod[]>([]);
-
   const [loading, setLoading] = useState(false);
-
   const [search, setSearch] = useState("");
-
   const [formOpen, setFormOpen] = useState(false);
 
   const [selectedPeriod, setSelectedPeriod] =
@@ -41,7 +35,6 @@ export default function ExamPeriodDialog({
       setError("");
 
       const data = await examPeriodApi.getAll();
-
       setPeriods(data);
     } catch (err) {
       setError(
@@ -62,12 +55,14 @@ export default function ExamPeriodDialog({
 
   // Open create modal
   const handleCreate = () => {
+    setError("");
     setSelectedPeriod(null);
     setFormOpen(true);
   };
 
   // Open edit modal
   const handleEdit = (period: ExamPeriod) => {
+    setError("");
     setSelectedPeriod(period);
     setFormOpen(true);
   };
@@ -78,10 +73,7 @@ export default function ExamPeriodDialog({
       setError("");
 
       if (selectedPeriod) {
-        await examPeriodApi.update(
-          selectedPeriod.id,
-          data
-        );
+        await examPeriodApi.update(selectedPeriod.id, data);
       } else {
         await examPeriodApi.create(data);
       }
@@ -91,7 +83,14 @@ export default function ExamPeriodDialog({
 
       await fetchPeriods();
     } catch (err) {
-      throw err;
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to save exam period"
+      );
+
+      // Do not rethrow the error.
+      // This prevents an unhandled rejection.
     }
   };
 
@@ -107,7 +106,6 @@ export default function ExamPeriodDialog({
       setError("");
 
       await examPeriodApi.remove(id);
-
       await fetchPeriods();
     } catch (err) {
       setError(
@@ -127,16 +125,30 @@ export default function ExamPeriodDialog({
 
   return (
     <>
+      {/* Error Notification */}
+      {error && (
+        <div className="fixed left-1/2 top-5 z-[100] flex w-[90%] max-w-md -translate-x-1/2 items-start gap-3 rounded-xl border border-red-500/30 bg-[#1e293b] p-4 text-sm text-red-400 shadow-2xl">
+          <AlertCircle size={20} className="mt-0.5 shrink-0" />
+
+          <p className="flex-1">{error}</p>
+
+          <button
+            type="button"
+            onClick={() => setError("")}
+            className="text-slate-400 hover:text-white"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       {/* Main Dialog */}
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-
         <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-slate-700 bg-[#0f172a] shadow-2xl">
 
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-800 p-6">
-
             <div className="flex items-center gap-3">
-
               <div className="rounded-xl bg-blue-500/10 p-3 text-blue-400">
                 <CalendarDays size={22} />
               </div>
@@ -150,7 +162,6 @@ export default function ExamPeriodDialog({
                   Manage your examination sessions.
                 </p>
               </div>
-
             </div>
 
             <button
@@ -160,14 +171,11 @@ export default function ExamPeriodDialog({
             >
               <X size={20} />
             </button>
-
           </div>
 
           {/* Search and Create */}
           <div className="flex flex-col justify-between gap-4 p-6 sm:flex-row sm:items-center">
-
             <div className="relative w-full sm:max-w-sm">
-
               <Search
                 size={18}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -179,7 +187,6 @@ export default function ExamPeriodDialog({
                 placeholder="Search exam periods..."
                 className="w-full rounded-xl border border-slate-700 bg-[#111b30] py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-blue-500"
               />
-
             </div>
 
             <button
@@ -190,13 +197,11 @@ export default function ExamPeriodDialog({
               <Plus size={18} />
               New Exam Period
             </button>
-
           </div>
 
           {/* Summary */}
           <div className="px-6 pb-4">
             <div className="inline-flex items-center gap-3 rounded-xl border border-slate-800 bg-[#111b30] px-4 py-3">
-
               <div>
                 <p className="text-xs text-slate-400">
                   Total Exam Periods
@@ -206,29 +211,18 @@ export default function ExamPeriodDialog({
                   {periods.length}
                 </p>
               </div>
-
             </div>
           </div>
 
-          {/* Error */}
-          {error && (
-            <div className="mx-6 mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
-              {error}
-            </div>
-          )}
-
           {/* Table */}
           <div className="overflow-y-auto px-6 pb-6">
-
             <ExamPeriodTable
               periods={filteredPeriods}
               loading={loading}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
-
           </div>
-
         </div>
       </div>
 
@@ -239,6 +233,7 @@ export default function ExamPeriodDialog({
         onClose={() => {
           setFormOpen(false);
           setSelectedPeriod(null);
+          setError("");
         }}
         onSubmit={handleSave}
       />

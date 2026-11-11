@@ -12,11 +12,16 @@ export interface ExamPeriodInput {
   endsAt: string | null;
 }
 
+interface ApiResponse<T> {
+  message: string;
+  data: T;
+}
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 async function request<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const token =
     typeof window !== "undefined"
@@ -32,32 +37,45 @@ async function request<T>(
     },
   });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => null);
-    throw new Error(error?.message || "Something went wrong");
-  }
+if (!response.ok) {
+  const error = await response.json().catch(() => null);
 
+  const message = Array.isArray(error?.message)
+    ? error.message.join(", ")
+    : error?.message || "Something went wrong";
+
+  throw new Error(message);
+}
   return response.json();
 }
 
 export const examPeriodApi = {
-  getAll: () =>
-    request<ExamPeriod[]>("/admin/exam-periods"),
+  // Get all exam periods
+  async getAll(): Promise<ExamPeriod[]> {
+    const response = await request<ApiResponse<ExamPeriod[]>>(
+      "/admin/results/exam-periods",
+    );
 
+    return response.data;
+  },
+
+  // Create exam period
   create: (data: ExamPeriodInput) =>
-    request<ExamPeriod>("/admin/exam-periods", {
+    request<ApiResponse<ExamPeriod>>("/admin/results/exam-periods", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
+  // Update exam period
   update: (id: number, data: ExamPeriodInput) =>
-    request<ExamPeriod>(`/admin/exam-periods/${id}`, {
+    request<ApiResponse<ExamPeriod>>(`/admin/results/exam-periods/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
 
+  // Delete exam period
   remove: (id: number) =>
-    request<void>(`/admin/exam-periods/${id}`, {
+    request<void>(`/admin/results/exam-periods/${id}`, {
       method: "DELETE",
     }),
 };
