@@ -19,6 +19,14 @@ export interface GradeBand {
 
 // ── Admin ──
 
+export interface ExamPeriod {
+  id: number;
+  name: string;
+  startsAt: string | null;
+  endsAt: string | null;
+  createdAt: string;
+}
+
 export interface ExamSummary {
   id: number;
   name: string;
