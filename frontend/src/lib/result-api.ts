@@ -113,9 +113,9 @@ export const resultApi = {
     );
   },
 
-  async getExamPeriods(): Promise<ExamPeriod[]> {
-  return requestData<ExamPeriod[]>("/admin/results/exam-periods");
-},
+//   async getExamPeriods(): Promise<ExamPeriod[]> {
+//   return requestData<ExamPeriod[]>("/admin/results/exam-periods");
+// },
 
   // Get exam overview
   async getOverview(

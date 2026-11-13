@@ -2,14 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  RefreshCw,
-  Search,
-  TriangleAlert,
-  CalendarDays,
-} from "lucide-react";
+import { RefreshCw, Search, TriangleAlert, CalendarDays } from "lucide-react";
 
 import { resultApi } from "@/lib/result-api";
+import { examPeriodApi } from "@/lib/exam-periods";
+import type { ExamPeriod } from "@/lib/exam-periods";
+
 import type {
   ExamSummary,
   ExamType,
@@ -27,6 +25,7 @@ export default function ExamResultsListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
+  const [periods, setPeriods] = useState<ExamPeriod[]>([]);
 
   const [search, setSearch] = useState("");
   const [period, setPeriod] = useState("");
@@ -67,11 +66,22 @@ export default function ExamResultsListPage() {
   }, [attempt]);
 
   // Extract unique exam periods from the exams
-  const periods = useMemo(
-    () =>
-      [...new Map(exams.map((e) => [e.examPeriod.id, e.examPeriod])).values()],
-    [exams]
-  );
+  // Fetch exam periods
+
+  // Fetch exam periods
+
+  useEffect(() => {
+    const fetchPeriods = async () => {
+      try {
+        const data = await examPeriodApi.getAll();
+        setPeriods(data);
+      } catch (error) {
+        console.error("Failed to fetch exam periods:", error);
+      }
+    };
+
+    fetchPeriods();
+  }, []);
 
   // Apply search and filters
   const visible = useMemo(() => {
@@ -82,7 +92,7 @@ export default function ExamResultsListPage() {
         (!period || String(e.examPeriod.id) === period) &&
         (!type || e.examType === type) &&
         (!status || e.status === status) &&
-        (!q || e.name.toLowerCase().includes(q))
+        (!q || e.name.toLowerCase().includes(q)),
     );
   }, [exams, search, period, type, status]);
 
@@ -91,9 +101,7 @@ export default function ExamResultsListPage() {
       {/* Page Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold sm:text-3xl">
-            Results
-          </h1>
+          <h1 className="font-serif text-2xl font-bold sm:text-3xl">Results</h1>
 
           <p className="mt-1 text-sm text-muted-foreground">
             Open an exam to enter marks subject by subject. Results are
@@ -155,9 +163,7 @@ export default function ExamResultsListPage() {
 
         <select
           value={status}
-          onChange={(e) =>
-            setStatus(e.target.value as "" | PublicationStatus)
-          }
+          onChange={(e) => setStatus(e.target.value as "" | PublicationStatus)}
           aria-label="Status"
           className={select}
         >
@@ -175,9 +181,7 @@ export default function ExamResultsListPage() {
           aria-label="Refresh exams"
           className="inline-flex items-center justify-center rounded-xl border border-border bg-background px-3.5 py-2.5 transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <RefreshCw
-            className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
         </button>
       </div>
 
@@ -245,7 +249,7 @@ export default function ExamResultsListPage() {
                 const percent =
                   exam.subjectCount > 0
                     ? Math.round(
-                        (exam.completedSubjects / exam.subjectCount) * 100
+                        (exam.completedSubjects / exam.subjectCount) * 100,
                       )
                     : 0;
 
@@ -319,11 +323,6 @@ export default function ExamResultsListPage() {
     </div>
   );
 }
-
-
-
-
-
 
 // "use client";
 
