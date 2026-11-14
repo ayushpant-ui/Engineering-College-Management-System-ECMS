@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Loader2, ShieldCheck, Wallet } from "lucide-react";
 
 interface EsewaPaymentProps {
-  applicationId: string;
+  applicationId?: string;
   amount: number;
 }
 
