@@ -17,7 +17,6 @@ model Contact {
   subject   String
   message   String
   createdAt DateTime @default(now())
-
 }
 
 // ======================================================
@@ -31,7 +30,6 @@ model StudentAccount {
   mustChangePassword Boolean @default(true)
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
 }
 
 model Admin {
@@ -83,12 +81,12 @@ model Notice {
 // ENUMS
 // ======================================================
 
-enum ExamType{
+enum ExamType {
   REGULAR
   BACKLOG
 }
 
-enum ResultStatus{
+enum ResultStatus {
   DRAFT
   PUBLISHED
 }
@@ -122,11 +120,11 @@ model Department {
 // ======================================================
 
 model AcademicYear {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
   startDate DateTime?
   endDate   DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   students Student[]
 
@@ -144,14 +142,14 @@ model Student {
   departmentId       Int
   admissionYearId    Int
   semester           Int
-  profileImageUrl    String ?
-  profileImageKey    String ? 
+  profileImageUrl    String?
+  profileImageKey    String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   examApplications ExamApplication[]
 
-  department   Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  department    Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   admissionYear AcademicYear @relation(fields: [admissionYearId], references: [id], onDelete: Restrict)
 
   account        StudentAccount?
@@ -172,7 +170,7 @@ model Curriculum {
   departmentId Int
   createdAt    DateTime @default(now())
 
-  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  department Department          @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   subjects   CurriculumSubject[]
 
   @@unique([departmentId, name, version])
@@ -217,6 +215,7 @@ model CurriculumSubject {
   @@index([curriculumId, semester])
   @@map("curriculum_subjects")
 }
+
 // ======================================================
 // EXAMINATION PERIOD
 // ======================================================
@@ -243,15 +242,27 @@ model Exam {
   semester     Int
   examType     ExamType
   examPeriodId Int
-  createdAt    DateTime @default(now())
 
-  examPeriod ExamPeriod @relation(fields: [examPeriodId], references: [id], onDelete: Restrict)
-  enrollments ExamEnrollment[]
-  publication ResultPublication?
+  fee          Decimal @db.Decimal(10, 2)
+  backPaperFee Decimal @db.Decimal(10, 2)
 
+  formOpensAt  DateTime
+  formClosesAt DateTime
+  examStartsAt DateTime
+
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  examPeriod   ExamPeriod         @relation(fields: [examPeriodId], references: [id], onDelete: Restrict)
+  enrollments  ExamEnrollment[]
+  publication  ResultPublication?
   applications ExamApplication[]
 
   @@index([examPeriodId, semester, examType])
+  @@index([isPublished, formOpensAt])
   @@map("exams")
 }
 
@@ -265,8 +276,8 @@ model ExamEnrollment {
   examId    Int
   createdAt DateTime @default(now())
 
-  student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
-  exam    Exam    @relation(fields: [examId], references: [id], onDelete: Restrict)
+  student Student  @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  exam    Exam     @relation(fields: [examId], references: [id], onDelete: Restrict)
   results Result[]
 
   @@unique([studentId, examId])
@@ -290,14 +301,16 @@ model ExamApplication {
   studentId Int
   examId    Int
 
-  phone       String
-  backPapers  Json?
+  phone      String
+  backPapers Json?
 
-  status      ExamApplicationStatus @default(PENDING)
-  remark      String?
+  totalFee Decimal @db.Decimal(10, 2)
+
+  status       ExamApplicationStatus @default(PENDING)
+  remark       String?
   symbolNumber String?
 
-  submittedAt DateTime @default(now())
+  submittedAt DateTime  @default(now())
   reviewedAt  DateTime?
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
@@ -320,14 +333,15 @@ model Result {
   enrollment ExamEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Restrict)
   subject    Subject        @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
-  components  ResultComponent[]
-  auditLogs   ResultAudit[]
+  components    ResultComponent[]
+  auditLogs     ResultAudit[]
   recognizedFor StudentSubjectRecord? @relation("RecognizedResult")
 
   @@unique([enrollmentId, subjectId])
   @@index([subjectId])
   @@map("results")
 }
+
 // ======================================================
 // EXAMINATION RESULT PUBLICATION
 // ONE PUBLICATION RECORD PER EXAM
@@ -372,16 +386,16 @@ model StudentSubjectRecord {
 // ======================================================
 
 model ResultAudit {
-  id                Int      @id @default(autoincrement())
+  id                Int  @id @default(autoincrement())
   resultId          Int
   resultComponentId Int?
 
   action    ResultAction
-  oldMarks  Decimal? @db.Decimal(6, 2)
-  newMarks  Decimal? @db.Decimal(6, 2)
+  oldMarks  Decimal?     @db.Decimal(6, 2)
+  newMarks  Decimal?     @db.Decimal(6, 2)
   reason    String?
   adminId   Int?
-  createdAt DateTime @default(now())
+  createdAt DateTime     @default(now())
 
   result          Result           @relation(fields: [resultId], references: [id], onDelete: Restrict)
   resultComponent ResultComponent? @relation(fields: [resultComponentId], references: [id], onDelete: Restrict)
@@ -407,7 +421,6 @@ model SubjectComponent {
   @@map("subject_components")
 }
 
-
 model CurriculumSubjectComponent {
   id                  Int @id @default(autoincrement())
   curriculumSubjectId Int
@@ -426,22 +439,21 @@ model CurriculumSubjectComponent {
   @@map("curriculum_subject_components")
 }
 
-
 model GradeScale {
-  id             Int      @id @default(autoincrement())
-  grade          String   @unique
-  minPercentage  Decimal  @db.Decimal(5, 2)
-  maxPercentage  Decimal  @db.Decimal(5, 2)
-  gradeValue     Decimal  @db.Decimal(4, 2)
+  id            Int     @id @default(autoincrement())
+  grade         String  @unique
+  minPercentage Decimal @db.Decimal(5, 2)
+  maxPercentage Decimal @db.Decimal(5, 2)
+  gradeValue    Decimal @db.Decimal(4, 2)
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@map("grade_scales")
 }
 
 model ResultComponent {
-  id                          Int      @id @default(autoincrement())
-  resultId                    Int
+  id                           Int @id @default(autoincrement())
+  resultId                     Int
   curriculumSubjectComponentId Int
 
   marksObtained Decimal? @db.Decimal(6, 2)
@@ -452,7 +464,7 @@ model ResultComponent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  result                    Result                    @relation(fields: [resultId], references: [id], onDelete: Restrict)
+  result                     Result                     @relation(fields: [resultId], references: [id], onDelete: Restrict)
   curriculumSubjectComponent CurriculumSubjectComponent @relation(fields: [curriculumSubjectComponentId], references: [id], onDelete: Restrict)
 
   auditLogs ResultAudit[]
@@ -479,11 +491,7 @@ model Payment {
   id String @id @default(cuid())
 
   applicationId String
-  application   ExamApplication @relation(
-    fields: [applicationId],
-    references: [id],
-    onDelete: Restrict
-  )
+  application   ExamApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
 
   amount   Decimal @db.Decimal(10, 2)
   currency String  @default("NPR")
@@ -491,12 +499,13 @@ model Payment {
   gateway PaymentGateway @default(ESEWA)
   status  PaymentStatus  @default(PENDING)
 
-  transactionUuid String @unique
+  transactionUuid String  @unique
   transactionCode String?
   referenceId     String?
   productCode     String
 
-  verifiedAt DateTime?
+  failureReason String?
+  verifiedAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
