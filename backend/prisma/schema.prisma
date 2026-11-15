@@ -149,6 +149,8 @@ model Student {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  examApplications ExamApplication[]
+
   department   Department   @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   admissionYear AcademicYear @relation(fields: [admissionYearId], references: [id], onDelete: Restrict)
 
@@ -247,6 +249,8 @@ model Exam {
   enrollments ExamEnrollment[]
   publication ResultPublication?
 
+  applications ExamApplication[]
+
   @@index([examPeriodId, semester, examType])
   @@map("exams")
 }
@@ -273,6 +277,38 @@ model ExamEnrollment {
 // ======================================================
 // RESULTS: ONE RECORD PER ENROLLED STUDENT AND SUBJECT
 // ======================================================
+
+enum ExamApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ExamApplication {
+  id String @id @default(cuid())
+
+  studentId Int
+  examId    Int
+
+  phone       String
+  backPapers  Json?
+
+  status      ExamApplicationStatus @default(PENDING)
+  remark      String?
+  symbolNumber String?
+
+  submittedAt DateTime @default(now())
+  reviewedAt  DateTime?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  exam    Exam    @relation(fields: [examId], references: [id], onDelete: Restrict)
+
+  payments Payment[]
+
+  @@unique([studentId, examId])
+  @@index([examId, status])
+  @@map("exam_applications")
+}
 
 model Result {
   id           Int      @id @default(autoincrement())
@@ -423,4 +459,49 @@ model ResultComponent {
 
   @@unique([resultId, curriculumSubjectComponentId])
   @@map("result_components")
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETE
+  FAILED
+  CANCELED
+  REFUNDED
+  PARTIAL_REFUND
+  REVIEW_REQUIRED
+}
+
+enum PaymentGateway {
+  ESEWA
+}
+
+model Payment {
+  id String @id @default(cuid())
+
+  applicationId String
+  application   ExamApplication @relation(
+    fields: [applicationId],
+    references: [id],
+    onDelete: Restrict
+  )
+
+  amount   Decimal @db.Decimal(10, 2)
+  currency String  @default("NPR")
+
+  gateway PaymentGateway @default(ESEWA)
+  status  PaymentStatus  @default(PENDING)
+
+  transactionUuid String @unique
+  transactionCode String?
+  referenceId     String?
+  productCode     String
+
+  verifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([applicationId])
+  @@index([status])
+  @@map("payments")
 }
