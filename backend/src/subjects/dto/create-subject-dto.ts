@@ -1,6 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator';
-
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsString,
+  ArrayNotEmpty,
+} from 'class-validator';
+import { SubjectComponentType } from '@prisma/client';
 export class CreateSubjectDto {
+    
     @IsString()
     @IsNotEmpty()
     code! : string ; 
@@ -8,4 +15,9 @@ export class CreateSubjectDto {
     @IsString()
     @IsNotEmpty()
     name! : string ; 
+
+    @IsArray()
+    @ArrayNotEmpty()
+    @IsEnum(SubjectComponentType,{each: true})
+    components! : SubjectComponentType[]
 }

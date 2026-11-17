@@ -26,18 +26,50 @@ export default function SubjectsPage() {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError("");
-    curriculumApi
-      .listSubjects()
-      .then((data) => !cancelled && setSubjects(data))
-      .catch(() => !cancelled && setError("Could not load subjects."))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [attempt]);
+  let cancelled = false;
+
+  setLoading(true);
+  setError("");
+
+  curriculumApi
+    .listSubjects()
+    .then((data) => {
+      console.log("Subjects API response:", data);
+
+      if (!cancelled) {
+        setSubjects(data);
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to load subjects:", error);
+
+      if (!cancelled) {
+        setError(error.message || "Could not load subjects.");
+      }
+    })
+    .finally(() => {
+      if (!cancelled) {
+        setLoading(false);
+      }
+    });
+
+  return () => {
+    cancelled = true;
+  };
+}, [attempt]);
+  // useEffect(() => {
+  //   let cancelled = false;
+  //   setLoading(true);
+  //   setError("");
+  //   curriculumApi
+  //     .listSubjects()
+  //     .then((data) => !cancelled && setSubjects(data))
+  //     .catch(() => !cancelled && setError("Could not load subjects."))
+  //     .finally(() => !cancelled && setLoading(false));
+  //   return () => {
+  //     cancelled = true;
+  //   };
+  // }, [attempt]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
