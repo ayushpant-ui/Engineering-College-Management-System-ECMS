@@ -73,4 +73,15 @@ async getAllSubjects() {
     })),
   };
 }
+
+async deleteSubject(id:number){
+    await this.prisma.subject.delete({
+        where:{
+            id:id
+        }
+    })
+    return{
+        message:`Subject of id:${id} deleted Successfully`
+    }
+}
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post,Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post,Body, UseGuards, Delete ,Param,ParseIntPipe} from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject-dto';
 import { SubjectsService } from './subjects.service';
 import {AdminGuard} from '../adminauth/admin.guard'
@@ -16,6 +16,11 @@ export class SubjectsController {
     @Get('subjects')
     async getAllSubjects() {
         return await this.subjectsService.getAllSubjects();
+    }
+
+    @Delete('subjects/:id')
+    async deleteSubject(@Param('id',ParseIntPipe) id:number ){
+        return await this.subjectsService.deleteSubject(id);
     }
  }
 
