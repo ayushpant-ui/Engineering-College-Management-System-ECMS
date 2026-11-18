@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateSubjectDto } from './dto/create-subject-dto';
+import { UpdateSubjectDTO } from './dto/update-subject-dto';
 @Injectable()
 export class SubjectsService {
   constructor(private prisma: PrismaService) {}
@@ -83,5 +84,34 @@ async deleteSubject(id:number){
     return{
         message:`Subject of id:${id} deleted Successfully`
     }
+}
+
+async updateSubject(id:number,dto:UpdateSubjectDTO){
+  const subject = await this.prisma.subject.update({
+    where:{
+      id
+    },
+    data: {
+      ...(dto.code!== undefined) && {code : dto.code} , 
+      ...(dto.name!== undefined ) && {name : dto.name} , 
+      
+
+      ...(dto.components!== undefined) && {components: {
+        deleteMany: {} ,
+        create : dto.components.map((type)=> ({
+          type,
+        })),
+      }
+      }
+    },
+      include:{
+        components:true
+    },
+  });
+
+  return {
+    message : `Successfully Updated Subject${id}`,
+    data : subject
+  }
 }
 }
