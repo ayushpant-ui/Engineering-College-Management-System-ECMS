@@ -93,7 +93,7 @@ async updateSubject(id:number,dto:UpdateSubjectDTO){
     },
     data: {
       ...(dto.code!== undefined) && {code : dto.code} , 
-      ...(dto.name!== undefined ) && {name : dto.name} , 
+      ...(dto.name!== undefined) && {name : dto.name} , 
       
 
       ...(dto.components!== undefined) && {components: {

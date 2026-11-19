@@ -12,89 +12,259 @@ import {
   Search,
   Trash2,
   TriangleAlert,
+  X,
 } from "lucide-react";
 
 import { adminFetch, AdminApiError } from "@/lib/admin-api";
-import { departmentName, type AdminStudent, type StudentList } from "@/lib/admin-students";
+import {
+  departmentName,
+  type AdminStudent,
+  type StudentList,
+} from "@/lib/admin-students";
+
 import ConfirmReasonModal from "@/components/modules/admin/results/ConfirmReasonModal";
 import StudentFormModal from "./StudentFormModal";
 import TemporaryPasswordModal from "./TemporaryPaswordModal";
 
+// --------------------------------------------------
+// Types
+// --------------------------------------------------
+
+interface DepartmentOption {
+  id: number;
+  name: string;
+}
+
+interface AcademicYearOption {
+  id: number;
+  name: string;
+}
+
 type Dialog =
   | { type: "none" }
   | { type: "form"; student: AdminStudent | null }
-  | { type: "credentials"; title: string; student: AdminStudent; password: string }
+  | {
+      type: "credentials";
+      title: string;
+      student: AdminStudent;
+      password: string;
+    }
   | { type: "reset"; student: AdminStudent }
   | { type: "delete"; student: AdminStudent };
 
-const message = (err: unknown) => (err instanceof AdminApiError ? err.message : "Something went wrong. Please try again.");
+// --------------------------------------------------
+// Helpers
+// --------------------------------------------------
+
+const message = (err: unknown) =>
+  err instanceof AdminApiError
+    ? err.message
+    : "Something went wrong. Please try again.";
+
+// --------------------------------------------------
+// Component
+// --------------------------------------------------
 
 export default function AdminStudentsPage() {
+  // Student data
   const [data, setData] = useState<StudentList | null>(null);
+
+  // Pagination
   const [page, setPage] = useState(1);
+
+  // Search
   const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState(""); // debounced copy
+  const [search, setSearch] = useState("");
+
+  // Filters
+  const [departmentId, setDepartmentId] = useState("");
+  const [admissionYearId, setAdmissionYearId] = useState("");
   const [semester, setSemester] = useState("");
+
+  // Filter dropdown data
+  const [departments, setDepartments] = useState<DepartmentOption[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYearOption[]>(
+    []
+  );
+
+  // Loading and errors
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Refresh
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Dialogs and toast
   const [dialog, setDialog] = useState<Dialog>({ type: "none" });
   const [toast, setToast] = useState("");
 
+  // --------------------------------------------------
+  // Toast
+  // --------------------------------------------------
+
   const showToast = useCallback((text: string) => {
     setToast(text);
-    setTimeout(() => setToast(""), 3500);
+
+    setTimeout(() => {
+      setToast("");
+    }, 3500);
   }, []);
 
-  // Wait until the admin stops typing before searching
+  // --------------------------------------------------
+  // Search debounce
+  // --------------------------------------------------
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearch(searchInput.trim());
       setPage(1);
     }, 350);
+
     return () => clearTimeout(timer);
   }, [searchInput]);
+
+  // --------------------------------------------------
+  // Load departments and academic years
+  // --------------------------------------------------
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
-      setLoading(true);
-      setError("");
-      const params = new URLSearchParams({ page: String(page), limit: "10" });
-      if (search) params.set("search", search);
-      if (semester) params.set("semester", semester);
-
+    async function loadFilters() {
       try {
-        const result = await adminFetch<StudentList>(`/admin/students?${params}`);
-        if (!cancelled) setData(result);
+        const [departmentData, academicYearData] = await Promise.all([
+          adminFetch<DepartmentOption[]>("/admin/departments"),
+          adminFetch<AcademicYearOption[]>("/admin/academic-years"),
+        ]);
+
+        if (!cancelled) {
+          setDepartments(departmentData);
+          setAcademicYears(academicYearData);
+        }
       } catch (err) {
-        if (!cancelled) setError(message(err));
-      } finally {
-        if (!cancelled) setLoading(false);
+        console.error("Failed to load student filters:", err);
       }
     }
 
-    load();
+    loadFilters();
+
     return () => {
       cancelled = true;
     };
-  }, [page, search, semester, refreshKey]);
+  }, []);
 
-  const refresh = () => setRefreshKey((n) => n + 1);
-  const close = () => setDialog({ type: "none" });
+  // --------------------------------------------------
+  // Load students
+  // --------------------------------------------------
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStudents() {
+      setLoading(true);
+      setError("");
+
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: "10",
+      });
+
+      if (search) {
+        params.set("search", search);
+      }
+
+      if (departmentId) {
+        params.set("departmentId", departmentId);
+      }
+
+      if (admissionYearId) {
+        params.set("admissionYearId", admissionYearId);
+      }
+
+      if (semester) {
+        params.set("semester", semester);
+      }
+
+      try {
+        const result = await adminFetch<StudentList>(
+          `/admin/students?${params.toString()}`
+        );
+
+        if (!cancelled) {
+          setData(result);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(message(err));
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadStudents();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    page,
+    search,
+    departmentId,
+    admissionYearId,
+    semester,
+    refreshKey,
+  ]);
+
+  // --------------------------------------------------
+  // Helpers
+  // --------------------------------------------------
+
+  const refresh = () => {
+    setRefreshKey((n) => n + 1);
+  };
+
+  const close = () => {
+    setDialog({ type: "none" });
+  };
 
   const items = data?.items ?? [];
 
+  const hasFilters = Boolean(
+    searchInput || departmentId || admissionYearId || semester
+  );
+
+  const clearFilters = () => {
+    setSearchInput("");
+    setSearch("");
+    setDepartmentId("");
+    setAdmissionYearId("");
+    setSemester("");
+    setPage(1);
+  };
+
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
+
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
+
+      {/* Header */}
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold sm:text-3xl">Students</h1>
+          <h1 className="font-serif text-2xl font-bold sm:text-3xl">
+            Students
+          </h1>
+
           <p className="mt-1 text-sm text-muted-foreground">
             Add students, update their details and reset forgotten passwords.
           </p>
         </div>
+
         <button
           onClick={() => setDialog({ type: "form", student: null })}
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
@@ -104,17 +274,27 @@ export default function AdminStudentsPage() {
         </button>
       </div>
 
+      {/* Toast */}
+
       {toast && (
-        <div role="status" className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-500/10 dark:text-green-400">
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700 dark:bg-green-500/10 dark:text-green-400"
+        >
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           {toast}
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+
+      <div className="flex flex-wrap items-center gap-3">
+
+        {/* Search */}
+
         <div className="relative min-w-[220px] flex-1 sm:max-w-sm">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
           <input
             type="search"
             value={searchInput}
@@ -124,6 +304,49 @@ export default function AdminStudentsPage() {
             className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
           />
         </div>
+
+        {/* Department Filter */}
+
+        <select
+          value={departmentId}
+          onChange={(e) => {
+            setDepartmentId(e.target.value);
+            setPage(1);
+          }}
+          aria-label="Filter by department"
+          className="rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+        >
+          <option value="">All Departments</option>
+
+          {departments.map((department) => (
+            <option key={department.id} value={department.id}>
+              {department.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Admission Year Filter */}
+
+        <select
+          value={admissionYearId}
+          onChange={(e) => {
+            setAdmissionYearId(e.target.value);
+            setPage(1);
+          }}
+          aria-label="Filter by admission year"
+          className="rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
+        >
+          <option value="">All Admission Years</option>
+
+          {academicYears.map((year) => (
+            <option key={year.id} value={year.id}>
+              {year.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Semester Filter */}
+
         <select
           value={semester}
           onChange={(e) => {
@@ -133,19 +356,39 @@ export default function AdminStudentsPage() {
           aria-label="Filter by semester"
           className="rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/30"
         >
-          <option value="">All semesters</option>
+          <option value="">All Semesters</option>
+
           {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
             <option key={s} value={s}>
               Semester {s}
             </option>
           ))}
         </select>
+
+        {/* Clear Filters */}
+
+        {hasFilters && (
+          <button
+            onClick={clearFilters}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3.5 py-2.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+            Clear Filters
+          </button>
+        )}
       </div>
 
+      {/* Error */}
+
       {error && (
-        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
+        <div
+          role="alert"
+          className="flex flex-wrap items-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400"
+        >
           <TriangleAlert className="h-4 w-4 shrink-0" />
+
           <span className="flex-1">{error}</span>
+
           <button
             onClick={refresh}
             className="inline-flex items-center gap-1.5 rounded-lg border border-red-300 px-3 py-1.5 font-medium hover:bg-red-100 dark:border-red-500/40 dark:hover:bg-red-500/20"
@@ -156,44 +399,103 @@ export default function AdminStudentsPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Students Table */}
+
       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60">
-        <table className="w-full min-w-[760px] text-left text-sm">
+        <table className="w-full min-w-[950px] text-left text-sm">
+
+          {/* Table Header */}
+
           <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
             <tr>
-              <th className="px-4 py-3 font-semibold">Registration No.</th>
-              <th className="px-4 py-3 font-semibold">Name</th>
-              <th className="px-4 py-3 font-semibold">Department</th>
-              <th className="px-4 py-3 font-semibold">Semester</th>
-              <th className="px-4 py-3 font-semibold">Password</th>
-              <th className="px-4 py-3 text-right font-semibold">Actions</th>
+              <th className="px-4 py-3 font-semibold">
+                Registration No.
+              </th>
+
+              <th className="px-4 py-3 font-semibold">
+                Name
+              </th>
+
+              <th className="px-4 py-3 font-semibold">
+                Department
+              </th>
+
+              <th className="px-4 py-3 font-semibold">
+                Admission Year
+              </th>
+
+              <th className="px-4 py-3 font-semibold">
+                Semester
+              </th>
+
+              <th className="px-4 py-3 font-semibold">
+                Password
+              </th>
+
+              <th className="px-4 py-3 text-right font-semibold">
+                Actions
+              </th>
             </tr>
           </thead>
+
+          {/* Table Body */}
+
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+
+            {/* Loading */}
+
             {loading &&
               [0, 1, 2, 3].map((i) => (
                 <tr key={i}>
-                  <td colSpan={6} className="px-4 py-4">
+                  <td colSpan={7} className="px-4 py-4">
                     <div className="h-5 animate-pulse rounded bg-slate-100 dark:bg-slate-800" />
                   </td>
                 </tr>
               ))}
 
+            {/* Empty State */}
+
             {!loading && !error && items.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-14 text-center text-slate-400">
-                  {search || semester ? "No students match your filters." : "No students yet. Add the first one."}
+                <td
+                  colSpan={7}
+                  className="px-4 py-14 text-center text-slate-400"
+                >
+                  {hasFilters
+                    ? "No students match your filters."
+                    : "No students yet. Add the first one."}
                 </td>
               </tr>
             )}
 
+            {/* Students */}
+
             {!loading &&
               items.map((student) => (
-                <tr key={student.id} className="text-slate-700 dark:text-slate-200">
-                  <td className="whitespace-nowrap px-4 py-3 font-medium">{student.registrationNumber}</td>
-                  <td className="px-4 py-3">{student.fullName}</td>
-                  <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{departmentName(student.department)}</td>
-                  <td className="px-4 py-3">{student.semester}</td>
+                <tr
+                  key={student.id}
+                  className="text-slate-700 dark:text-slate-200"
+                >
+                  <td className="whitespace-nowrap px-4 py-3 font-medium">
+                    {student.registrationNumber}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {student.fullName}
+                  </td>
+
+                  <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                    {departmentName(student.department)}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {student.admissionYear?.name ?? "—"}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    {student.semester}
+                  </td>
+
                   <td className="px-4 py-3">
                     {student.mustChangePassword ? (
                       <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">
@@ -205,47 +507,72 @@ export default function AdminStudentsPage() {
                       </span>
                     )}
                   </td>
+
+                  {/* Actions */}
+
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
+
+                      {/* Edit */}
+
                       <button
-                        onClick={() => setDialog({ type: "form", student })}
+                        onClick={() =>
+                          setDialog({ type: "form", student })
+                        }
                         aria-label={`Edit ${student.fullName}`}
                         title="Edit"
                         className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-blue-600 dark:hover:bg-slate-800"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
+
+                      {/* Reset Password */}
+
                       <button
-                        onClick={() => setDialog({ type: "reset", student })}
+                        onClick={() =>
+                          setDialog({ type: "reset", student })
+                        }
                         aria-label={`Reset password for ${student.fullName}`}
                         title="Reset password"
                         className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-amber-600 dark:hover:bg-slate-800"
                       >
                         <KeyRound className="h-4 w-4" />
                       </button>
+
+                      {/* Delete */}
+
                       <button
-                        onClick={() => setDialog({ type: "delete", student })}
+                        onClick={() =>
+                          setDialog({ type: "delete", student })
+                        }
                         aria-label={`Delete ${student.fullName}`}
                         title="Delete"
                         className="rounded-lg p-2 text-slate-500 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
+
                     </div>
                   </td>
                 </tr>
               ))}
+
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
+
       {data && data.total > 0 && (
         <div className="flex items-center justify-between text-sm text-muted-foreground">
+
           <p>
-            {data.total} student{data.total === 1 ? "" : "s"} · Page {data.page} of {data.totalPages}
+            {data.total} student{data.total === 1 ? "" : "s"} · Page{" "}
+            {data.page} of {data.totalPages}
           </p>
+
           <div className="flex gap-2">
+
             <button
               onClick={() => setPage((p) => p - 1)}
               disabled={page <= 1 || loading}
@@ -254,6 +581,7 @@ export default function AdminStudentsPage() {
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
+
             <button
               onClick={() => setPage((p) => p + 1)}
               disabled={page >= data.totalPages || loading}
@@ -262,11 +590,12 @@ export default function AdminStudentsPage() {
             >
               <ChevronRight className="h-4 w-4" />
             </button>
+
           </div>
         </div>
       )}
 
-      {/* ── Dialogs ── */}
+      {/* Dialogs */}
 
       {dialog.type === "form" && (
         <StudentFormModal
@@ -278,7 +607,13 @@ export default function AdminStudentsPage() {
             showToast("Student updated.");
           }}
           onCreated={(student, password) => {
-            setDialog({ type: "credentials", title: "Student added", student, password });
+            setDialog({
+              type: "credentials",
+              title: "Student added",
+              student,
+              password,
+            });
+
             refresh();
           }}
         />
@@ -294,6 +629,8 @@ export default function AdminStudentsPage() {
         />
       )}
 
+      {/* Reset Password Dialog */}
+
       {dialog.type === "reset" && (
         <ConfirmReasonModal
           title="Reset password?"
@@ -302,12 +639,21 @@ export default function AdminStudentsPage() {
           onClose={close}
           onConfirm={async () => {
             const { student } = dialog;
+
             try {
-              const res = await adminFetch<{ temporaryPassword: string }>(
-                `/admin/students/${student.id}/reset-password`,
-                { method: "POST" }
-              );
-              setDialog({ type: "credentials", title: "Password reset", student, password: res.temporaryPassword });
+              const res = await adminFetch<{
+                temporaryPassword: string;
+              }>(`/admin/students/${student.id}/reset-password`, {
+                method: "POST",
+              });
+
+              setDialog({
+                type: "credentials",
+                title: "Password reset",
+                student,
+                password: res.temporaryPassword,
+              });
+
               refresh();
             } catch (err) {
               throw new Error(message(err));
@@ -315,6 +661,8 @@ export default function AdminStudentsPage() {
           }}
         />
       )}
+
+      {/* Delete Dialog */}
 
       {dialog.type === "delete" && (
         <ConfirmReasonModal
@@ -325,12 +673,19 @@ export default function AdminStudentsPage() {
           onClose={close}
           onConfirm={async () => {
             const { student } = dialog;
+
             try {
-              await adminFetch(`/admin/students/${student.id}`, { method: "DELETE" });
-              // If that was the last student on the page, step back one page
-              if (data && data.items.length === 1 && page > 1) setPage(page - 1);
+              await adminFetch(`/admin/students/${student.id}`, {
+                method: "DELETE",
+              });
+
+              if (data && data.items.length === 1 && page > 1) {
+                setPage(page - 1);
+              }
+
               close();
               refresh();
+
               showToast("Student deleted.");
             } catch (err) {
               throw new Error(message(err));
@@ -338,6 +693,7 @@ export default function AdminStudentsPage() {
           }}
         />
       )}
+
     </div>
   );
 }

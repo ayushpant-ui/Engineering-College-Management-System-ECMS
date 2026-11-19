@@ -34,12 +34,16 @@ export class AdminStudentController {
     @Query('limit') limit?: string,
     @Query('search') search?: string,
     @Query('semester') semester?: string,
+    @Query('departmentId') departmentId?: string,
+    @Query('admissionYearId') admissionYearId?: string,
   ) {
     return this.studentsService.list({
       page: toInt(page, 1)!,
       limit: Math.min(toInt(limit, 10)!, 50),
       search: search?.trim() || undefined,
       semester: toInt(semester),
+      departmentId: toInt(departmentId),
+      admissionYearId: toInt(admissionYearId),
     });
   }
 

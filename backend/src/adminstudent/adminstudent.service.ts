@@ -64,6 +64,8 @@ interface ListParams {
   limit: number;
   search?: string;
   semester?: number;
+    departmentId?: number;
+  admissionYearId?: number;
 }
 
 @Injectable()
@@ -72,51 +74,73 @@ export class AdminStudentsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async list({ page, limit, search, semester }: ListParams) {
-    const where: Prisma.StudentWhereInput = {
-      ...(semester !== undefined ? { semester } : {}),
+async list({
+  page,
+  limit,
+  search,
+  semester,
+  departmentId,
+  admissionYearId,
+}: ListParams) {
+  // Build dynamic filtering conditions
+  const where: Prisma.StudentWhereInput = {
+    ...(semester !== undefined && {
+      semester,
+    }),
 
-      ...(search
-        ? {
-            OR: [
-              {
-                fullName: {
-                  contains: search,
-                  mode: "insensitive",
-                },
+    ...(departmentId !== undefined && {
+      departmentId,
+    }),
+
+    ...(admissionYearId !== undefined && {
+      admissionYearId,
+    }),
+
+    ...(search
+      ? {
+          OR: [
+            {
+              fullName: {
+                contains: search,
+                mode: "insensitive",
               },
-              {
-                registrationNumber: {
-                  contains: search,
-                  mode: "insensitive",
-                },
+            },
+            {
+              registrationNumber: {
+                contains: search,
+                mode: "insensitive",
               },
-            ],
-          }
-        : {}),
-    };
+            },
+          ],
+        }
+      : {}),
+  };
 
-    const [items, total] = await Promise.all([
-      this.prisma.student.findMany({
-        where,
-        select: studentSelect,
-        orderBy: { registrationNumber: "asc" },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
+  // Fetch matching students and total count
+  const [items, total] = await Promise.all([
+    this.prisma.student.findMany({
+      where,
+      select: studentSelect,
+      orderBy: {
+        registrationNumber: "asc",
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
 
-      this.prisma.student.count({ where }),
-    ]);
+    this.prisma.student.count({
+      where,
+    }),
+  ]);
 
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.max(1, Math.ceil(total / limit)),
-    };
-  }
-
+  return {
+    items,
+    total,
+    page,
+    limit,
+    totalPages: Math.max(1, Math.ceil(total / limit)),
+  };
+}
   async create(dto: CreateStudentDto, adminId: number) {
     const temporaryPassword = generateTemporaryPassword();
     const passwordHash = await bcrypt.hash(temporaryPassword, 12);

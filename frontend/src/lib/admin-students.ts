@@ -11,7 +11,7 @@ export interface AdminStudent {
   admissionYear: {
     id: number;
     name: string;
-  };
+  } | null ;
 
   account: {
     mustChangePassword: boolean;
