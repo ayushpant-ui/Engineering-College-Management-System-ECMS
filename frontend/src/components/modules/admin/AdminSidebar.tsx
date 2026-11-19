@@ -14,6 +14,7 @@ import {
   MessageSquare,
   ShieldCheck,
   Users,
+  Layers,
 } from "lucide-react";
 
 import {
@@ -45,7 +46,8 @@ const sections = [
     label: "Academics",
     items: [
       { label: "Departments", href: "/admin/departments", icon: Building2, enabled: false },
-      { label: "Subjects", href: "/admin/subjects", icon: BookOpen, enabled: false },
+      { label: "Subjects", href: "/admin/subjects", icon: BookOpen, enabled: true },
+       { label: "Curricula", href: "/admin/curricula", icon: Layers, enabled: true },
       { label: "Results", href: "/admin/results", icon: FileText, enabled: true },
       { label: "Exams", href: "/admin/exams", icon: ClipboardList, enabled: true },
     ],

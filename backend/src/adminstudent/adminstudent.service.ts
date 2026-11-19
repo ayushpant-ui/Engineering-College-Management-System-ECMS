@@ -19,7 +19,7 @@ const studentSelect = {
   registrationNumber: true,
   semester: true,
 
-  // Fetch the related Department record.
+  // Fetches  the related Department record.
   department: {
     select: {
       id: true,
@@ -27,7 +27,7 @@ const studentSelect = {
     },
   },
 
-  // Fetch the related AcademicYear record.
+  // Fetches the related AcademicYear record.
   admissionYear: {
     select: {
       id: true,

@@ -10,7 +10,7 @@ export class CloudinaryService {
             api_key: process.env.CLOUDINARY_API_KEY,
             api_secret: process.env.CLOUDINARY_API_SECRET
         });
-    }
+    } 
 
  async uploadImage(file: Express.Multer.File) {
     try {
